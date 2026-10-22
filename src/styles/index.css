@@ -26,3 +26,14 @@ footer { padding-block:48px; border-top:1px solid var(--border-soft); background
 .offers-single .offer-card.featured { grid-row:auto }
 .offer-subtitle { margin:-12px 0 24px; text-align:center }
 @media (max-width:767px) { .card-grid.count-2 { grid-template-columns:1fr } }
+
+/* Tema escuro do app: fundo #090d16, seções #111827, cards #1f2937, verde e branco */
+:root { --background-section:#111827; --background-card:#1f2937; --background-card-light:#1f2937; --background-dark:#14532d; --background-image-placeholder:#1f2937; --border-soft:#263241; --border-placeholder:#374151; --text-title:#fff; --text-body:rgba(255,255,255,.82); background:#090d16 }
+body { background:#090d16 }
+.content-card, .offer-card { background:#1f2937 }
+.modal { background:#111827 }
+body footer { background:#090d16; border-top-color:#263241 }
+.hero-action img, .offer-card .offer-action img { filter:invert(1) grayscale(1) }
+.section-light { background:#f8fafc }
+.section-light h2 { color:#000 }
+.section-light p { color:rgba(0,0,0,.8) }
