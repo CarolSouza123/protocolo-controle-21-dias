@@ -63,9 +63,19 @@ function Carousel() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let frame = 0
     let previousTime = performance.now()
+    let pausedUntil = 0
+    let dragging = false
+    const pauseNow = () => { pausedUntil = performance.now() + 2500 }
+    const onPointerDown = () => { dragging = true; pauseNow() }
+    const onPointerUp = () => { dragging = false; pauseNow() }
+    const onScroll = () => { if (dragging) pauseNow() }
+    element.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('pointerup', onPointerUp)
+    element.addEventListener('touchstart', onPointerDown, { passive: true })
+    element.addEventListener('scroll', onScroll, { passive: true })
     const animate = (time: number) => {
       const segment = segmentWidth()
-      if (segment) {
+      if (segment && time >= pausedUntil && !dragging) {
         element.scrollLeft += ((time - previousTime) / 1000) * 75
         if (element.scrollLeft >= segment * 2) element.scrollLeft -= segment
       }
@@ -80,6 +90,10 @@ function Carousel() {
       if (frame) window.cancelAnimationFrame(frame)
       observer.disconnect()
       window.removeEventListener('resize', initialize)
+      element.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('pointerup', onPointerUp)
+      element.removeEventListener('touchstart', onPointerDown)
+      element.removeEventListener('scroll', onScroll)
     }
   }, [])
 
