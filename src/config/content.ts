@@ -51,7 +51,7 @@ export const pageContent = {
     simple: {
       title: 'Protocolo 21 Dias + Bônus Inclusos',
       items: ['Guia de Localização do Músculo Certo', 'Web App com Cronômetro dos 21 Dias', 'Bônus 01: O Reset da Respiração na Hora H', 'Bônus 02: Áudio Guiado SOS Pré-Hora H', 'Acesso digital imediato no seu celular'],
-      previousPrice: 'R$ 67,00', installmentCount: 3, installmentValue: 'R$ 9,80', cashValue: 'R$ 27,00', ctaLabel: 'Quero durar mais',
+      previousPrice: 'R$ 67,00', installmentCount: 6, installmentValue: 'R$ 5,39', cashValue: 'R$ 27,00', ctaLabel: 'Quero durar mais',
     },
     complete: {
       badge: '', title: 'Protocolo 21 Dias + Bônus Inclusos',
@@ -63,12 +63,12 @@ export const pageContent = {
         { label: 'Bônus 02: Áudio Guiado SOS Pré-Hora H' },
         { label: 'Acesso digital imediato no seu celular' },
       ],
-      previousPrice: 'R$ 67,00', installmentCount: 3, installmentValue: 'R$ 9,80', cashValue: 'R$ 27,00', ctaLabel: 'Quero durar mais',
+      previousPrice: 'R$ 67,00', installmentCount: 6, installmentValue: 'R$ 5,39', cashValue: 'R$ 27,00', ctaLabel: 'Quero durar mais',
     },
     popup: {
       eyebrow: 'Espere! Não saia ainda...',
       message: '',
-      title: 'Oferta especial', previousPrice: 'R$ 67,00', installmentCount: 3, installmentValue: 'R$ 9,80', cashValue: 'R$ 27,00',
+      title: 'Oferta especial', previousPrice: 'R$ 67,00', installmentCount: 6, installmentValue: 'R$ 5,39', cashValue: 'R$ 27,00',
       ctaLabel: 'Quero durar mais', secondaryLabel: 'Não, quero continuar com a oferta.',
     },
   },
