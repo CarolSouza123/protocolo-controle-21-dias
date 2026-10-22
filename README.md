@@ -41,3 +41,5 @@ Base reutilizável de landing pages low-ticket.
 
 ## Cloudflare Workers Static Assets
 A matriz usa Workers Static Assets sem código de backend. O Vite gera `dist/` e o Wrangler publica somente esses arquivos estáticos. Cada cópia deve receber um `name` exclusivo em `wrangler.jsonc`; reutilizar o nome da matriz sobrescreveria o mesmo Worker.
+
+<!-- Ativacao do painel: republicacao disparada em 22/10/2026 apos vinculo do KV TRACK_KV e criacao da ADMIN_KEY no Cloudflare. -->
