@@ -70,3 +70,21 @@ body footer { background:#090d16; border-top-color:#263241 }
 .situation-help { margin:16px 0 0 }
 .situation-help strong { color:var(--brand-primary) }
 @media (max-width:767px) { .card-grid.count-4 { grid-template-columns:1fr } }
+
+/* Painel: filtro por data e funil horizontal */
+.panel-filters-card { padding:16px 24px }
+.panel-filters { display:flex; gap:8px; flex-wrap:wrap }
+.panel-chip { padding:8px 16px; border-radius:999px; border:1px solid var(--border-soft); background:#090d16; color:#fff; font-size:14px; font-weight:600 }
+.panel-chip.active { background:#16a34a; border-color:#16a34a }
+.panel-custom-range { display:flex; gap:16px; flex-wrap:wrap; margin-top:16px }
+.panel-custom-range label { display:grid; gap:8px; color:rgba(255,255,255,.8); font-size:14px }
+.panel-custom-range input { padding:10px 12px; border:1px solid var(--border-soft); border-radius:10px; background:#090d16; color:#fff; font-size:15px; color-scheme:dark }
+.funnel { display:grid; gap:20px }
+.funnel-meta { display:flex; align-items:baseline; gap:12px; margin-bottom:8px }
+.funnel-meta span { color:rgba(255,255,255,.75); font-size:15px }
+.funnel-meta strong { color:#fff; font-size:24px; margin:0 }
+.funnel-meta em { margin-left:auto; color:#4ade80; font-style:normal; font-weight:700; font-size:18px }
+.funnel-track { height:18px; border-radius:999px; background:#090d16; overflow:hidden }
+.funnel-fill { height:100%; border-radius:999px; transition:width .4s ease }
+.funnel-conv { display:block; margin-top:6px; color:rgba(255,255,255,.6); font-size:13px }
+.funnel-total { margin:4px 0 0; color:rgba(255,255,255,.85); font-weight:600 }
