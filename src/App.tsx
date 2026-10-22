@@ -5,6 +5,8 @@ import { links } from './config/links'
 import { seo } from './config/seo'
 import { theme } from './config/theme'
 import { withAttributionParams } from './utils/attribution'
+import { trackCheckout, trackVisitOnce } from './utils/panel'
+import Panel from './panel/Panel'
 
 const placeholder = (item: MediaItem, priority = false) => item.src ? (
   <img src={item.src} alt={item.alt} loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} />
@@ -12,7 +14,7 @@ const placeholder = (item: MediaItem, priority = false) => item.src ? (
 
 function Button({ children, onClick, href, kind = 'primary' }: { children: React.ReactNode; onClick?: () => void; href?: string; kind?: 'primary' | 'secondary' }) {
   const className = `button button-${kind}`
-  return href ? <a className={className} href={href}>{children}</a> : <button className={className} type="button" onClick={onClick}>{children}</button>
+  return href ? <a className={className} href={href} onClick={onClick}>{children}</a> : <button className={className} type="button" onClick={onClick}>{children}</button>
 }
 
 function UrgencyBar() {
@@ -112,6 +114,7 @@ const FeatureList = ({ items }: { items: readonly FeatureItem[] }) => <ul classN
 function App() {
   const [faqOpen, setFaqOpen] = useState<number | null>(0)
   useEffect(() => {
+    trackVisitOnce()
     document.title = seo.title
     const setMeta = (attribute: 'name' | 'property', key: string, content: string) => {
       if (!content) return
@@ -131,6 +134,7 @@ function App() {
     }
     Object.entries({ '--brand-primary': theme.brand.primary, '--brand-primary-dark': theme.brand.primaryDark, '--brand-primary-light': theme.brand.primaryLight, '--cta-color': theme.cta.color, '--cta-dark': theme.cta.dark, '--cta-light': theme.cta.light }).forEach(([key, value]) => document.documentElement.style.setProperty(key, value))
   }, [])
+  if (window.location.pathname.replace(/\/$/, '') === '/painel') return <Panel />
   return <>
     <UrgencyBar />
     <main>
@@ -139,7 +143,7 @@ function App() {
       <section className="section"><div className="container"><h2>{pageContent.modulesSection.title}</h2>{'subtitle' in pageContent.modulesSection && pageContent.modulesSection.subtitle && <p className="section-subtitle">{pageContent.modulesSection.subtitle}</p>}<Modules /></div></section>
       <section className="section section-muted"><div className="container"><h2>{pageContent.bonusesSection.title}</h2><div className={`card-grid count-${pageContent.bonuses.length}`}>{pageContent.bonuses.map(item => <article className="content-card bonus" key={item.eyebrow}><div className="square-media">{placeholder(item)}</div><span className="eyebrow">🎁 {item.eyebrow}: incluso na oferta</span><h3>{item.title}</h3><p>{item.description}</p>{item.value && <s>{item.value}</s>}</article>)}</div></div></section>
       <section className="section" id="ofertas"><div className="container"><h2>{pageContent.offersSection.title}</h2><div className="offers offers-single">
-        <article className="offer-card featured">{pageContent.offers.complete.badge && <span className="offer-badge">{pageContent.offers.complete.badge}</span>}<h3>{pageContent.offers.complete.title}</h3>{'subtitle' in pageContent.offers.complete && pageContent.offers.complete.subtitle && <p className="offer-subtitle">{pageContent.offers.complete.subtitle}</p>}<FeatureList items={pageContent.offers.complete.items} /><Price data={pageContent.offers.complete} /><div className="offer-action"><Button href={links.checkoutComplete ? withAttributionParams(links.checkoutComplete) : links.checkoutSimple ? withAttributionParams(links.checkoutSimple) : undefined}>{pageContent.offers.complete.ctaLabel}</Button><img src={pageContent.offersSection.paymentSecurityImage} alt={pageContent.offersSection.paymentSecurityAlt} loading="lazy" /></div></article>
+        <article className="offer-card featured">{pageContent.offers.complete.badge && <span className="offer-badge">{pageContent.offers.complete.badge}</span>}<h3>{pageContent.offers.complete.title}</h3>{'subtitle' in pageContent.offers.complete && pageContent.offers.complete.subtitle && <p className="offer-subtitle">{pageContent.offers.complete.subtitle}</p>}<FeatureList items={pageContent.offers.complete.items} /><Price data={pageContent.offers.complete} /><div className="offer-action"><Button onClick={trackCheckout} href={links.checkoutComplete ? withAttributionParams(links.checkoutComplete) : links.checkoutSimple ? withAttributionParams(links.checkoutSimple) : undefined}>{pageContent.offers.complete.ctaLabel}</Button><img src={pageContent.offersSection.paymentSecurityImage} alt={pageContent.offersSection.paymentSecurityAlt} loading="lazy" /></div></article>
       </div></div></section>
       <section className="section section-light"><div className="container guarantee"><img className="guarantee-seal" src={pageContent.guarantee.image} alt={pageContent.guarantee.imageAlt} loading="lazy" /><div><h2>{pageContent.guarantee.title}</h2><p>{pageContent.guarantee.body}</p></div></div></section>
       <section className="section"><div className="container narrow"><h2>{pageContent.faqSection.title}</h2><div className="faq">{pageContent.faq.map((item, index) => { const expanded = faqOpen === index; return <div className="faq-item" key={item.question}><button onClick={() => setFaqOpen(expanded ? null : index)} aria-expanded={expanded} aria-controls={`faq-${index}`}><span>{item.question}</span>{expanded ? <Minus /> : <Plus />}</button><div id={`faq-${index}`} hidden={!expanded}><p>{item.answer}</p></div></div> })}</div></div></section>
