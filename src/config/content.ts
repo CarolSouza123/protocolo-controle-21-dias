@@ -9,8 +9,8 @@ export const pageContent = {
   hero: {
     image: '/images/mockup-hero.webp',
     imageAlt: 'Mockup do Web App na tela do celular',
-    headline: 'Protocolo 21 Dias: um app com 5 minutos de treinamento por dia, para controlar a musculatura pélvica e aumentar seu tempo na cama em poucos dias',
-    body: 'Para homens que querem aguentar o tempo que quiserem na cama sem precisar de pílulas azuis, sprays anestésicos ou ficar pensando em coisas chatas na hora H.',
+    headline: 'Protocolo 21 Dias: um app com treinos de 5 minutos por dia, para controlar sua ejaculação em poucos dias',
+    body: 'Para homens que querem durar até 3x mais na cama e não depender de pílulas azuis, sprays anestésicos ou ficar pensando em coisas chatas na hora H.',
     bullets: [
       'Treino muscular guiado na tela do celular.',
       'Acesso digital discreto e direto após a confirmação.',
