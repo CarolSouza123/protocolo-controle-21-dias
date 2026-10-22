@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Check, Minus, Plus } from 'lucide-react'
 import { pageContent, type MediaItem } from './config/content'
 import { links } from './config/links'
@@ -47,60 +47,6 @@ function Price({ data }: { data: { previousPrice: string; installmentCount: numb
     <span className="price-before"><s>{data.previousPrice ? `De ${data.previousPrice}` : 'Preço anterior a definir'}</s> por apenas</span>
     <strong>{data.installmentCount && data.installmentValue ? `${data.installmentCount}x de ${data.installmentValue}` : 'Preço a definir'}</strong>
     <span>ou <b>{data.cashValue || 'valor a definir'}</b> à vista no PIX</span>
-  </div>
-}
-
-function Carousel() {
-  const ref = useRef<HTMLDivElement>(null)
-  const items = [...pageContent.results.items, ...pageContent.results.items, ...pageContent.results.items]
-  const segmentWidth = () => (ref.current?.scrollWidth ?? 0) / 3
-
-  useEffect(() => {
-    const element = ref.current
-    if (!element) return
-    const initialize = () => element.scrollTo({ left: segmentWidth() })
-    initialize()
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    let frame = 0
-    let previousTime = performance.now()
-    let pausedUntil = 0
-    let dragging = false
-    const pauseNow = () => { pausedUntil = performance.now() + 2500 }
-    const onPointerDown = () => { dragging = true; pauseNow() }
-    const onPointerUp = () => { dragging = false; pauseNow() }
-    const onScroll = () => { if (dragging) pauseNow() }
-    element.addEventListener('pointerdown', onPointerDown)
-    window.addEventListener('pointerup', onPointerUp)
-    element.addEventListener('touchstart', onPointerDown, { passive: true })
-    element.addEventListener('scroll', onScroll, { passive: true })
-    const animate = (time: number) => {
-      const segment = segmentWidth()
-      if (segment && time >= pausedUntil && !dragging) {
-        element.scrollLeft += ((time - previousTime) / 1000) * 75
-        if (element.scrollLeft >= segment * 2) element.scrollLeft -= segment
-      }
-      previousTime = time
-      frame = window.requestAnimationFrame(animate)
-    }
-    const observer = new ResizeObserver(initialize)
-    observer.observe(element)
-    if (!reduceMotion) frame = window.requestAnimationFrame(animate)
-    window.addEventListener('resize', initialize)
-    return () => {
-      if (frame) window.cancelAnimationFrame(frame)
-      observer.disconnect()
-      window.removeEventListener('resize', initialize)
-      element.removeEventListener('pointerdown', onPointerDown)
-      window.removeEventListener('pointerup', onPointerUp)
-      element.removeEventListener('touchstart', onPointerDown)
-      element.removeEventListener('scroll', onScroll)
-    }
-  }, [])
-
-  return <div className="carousel-wrap">
-    <div className="carousel" ref={ref} aria-label="Galeria de resultados">
-      {items.map((item, index) => <article className="result-card" aria-hidden={index < pageContent.results.items.length || index >= pageContent.results.items.length * 2} key={index}>{placeholder(item)}</article>)}
-    </div>
   </div>
 }
 
@@ -153,7 +99,7 @@ function App() {
     <UrgencyBar />
     <main>
       <section className="hero"><div className="container hero-inner"><div className="hero-media">{placeholder({ src: pageContent.hero.image, alt: pageContent.hero.imageAlt, label: 'Mockup do Web App na tela do celular', ratio: '3:2' }, true)}</div><h1>{pageContent.hero.headline}</h1><p className="lead">{pageContent.hero.body}</p>{pageContent.hero.bullets && <ul className="hero-bullets">{pageContent.hero.bullets.map(b => <li key={b}><Check aria-hidden="true" /><span>{b}</span></li>)}</ul>}<div className="hero-action"><Button onClick={() => document.getElementById('ofertas')?.scrollIntoView({ behavior: 'smooth' })}>{pageContent.hero.ctaLabel}</Button><img src={pageContent.hero.securityImage} alt={pageContent.hero.securityImageAlt} /></div></div></section>
-      <section className="section section-muted"><div className="container"><h2>{pageContent.results.title}</h2><Carousel /></div></section>
+      <section className="section section-muted"><div className="container"><h2>{pageContent.situations.title}</h2><p className="section-subtitle">{pageContent.situations.subtitle}</p><div className="card-grid count-4 situations-grid">{pageContent.situations.items.map(item => <article className="content-card situation" key={item.title}><h3>{item.title}</h3><p>{item.text}</p><p className="situation-help"><strong>Como o protocolo ajuda:</strong> {item.help}</p></article>)}</div></div></section>
       <section className="section"><div className="container"><h2>{pageContent.modulesSection.title}</h2>{'subtitle' in pageContent.modulesSection && pageContent.modulesSection.subtitle && <p className="section-subtitle">{pageContent.modulesSection.subtitle}</p>}<Modules /></div></section>
       <section className="section section-muted"><div className="container"><h2>{pageContent.bonusesSection.title}</h2><div className={`card-grid count-${pageContent.bonuses.length}`}>{pageContent.bonuses.map(item => <article className="content-card bonus" key={item.eyebrow}><div className="square-media">{placeholder(item)}</div><span className="eyebrow">🎁 {item.eyebrow}: incluso na oferta</span><h3>{item.title}</h3><p>{item.description}</p>{item.value && <s>{item.value}</s>}</article>)}</div></div></section>
       <section className="section" id="ofertas"><div className="container"><h2>{pageContent.offersSection.title}</h2><div className="offers offers-single">

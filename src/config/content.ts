@@ -19,14 +19,15 @@ export const pageContent = {
     securityImage: '/images/selos-seguranca-compra.svg',
     securityImageAlt: 'Selos de compra segura, satisfação garantida e privacidade protegida',
   },
-  results: {
-    title: 'Veja os relatos reais de quem segue o Protocolo 21 Dias',
-    items: Array.from({ length: 6 }, (_, index) => ({
-      src: '',
-      alt: `Print de conversa no WhatsApp: relato ${String(index + 1).padStart(2, '0')}`,
-      label: `Relato ${String(index + 1).padStart(2, '0')}`,
-      ratio: '2:3' as const,
-    })),
+  situations: {
+    title: 'Feito para homens que vivem isso',
+    subtitle: 'Se alguma dessas cenas é a sua, o protocolo foi montado para ela.',
+    items: [
+      { title: 'Acaba antes de entrar no ritmo', text: 'Ela mal começou a entrar no ritmo e você já perdeu o controle. Na próxima vez, a preocupação chega antes da própria relação.', help: 'Treino diário de 5 minutos que condiciona o músculo do controle, de forma progressiva, dia após dia.' },
+      { title: 'A cabeça não desliga', text: 'Em vez de curtir o momento, você fica de olho no tempo, com medo de falhar de novo.', help: 'A aba de respiração do app ensina a baixar a adrenalina antes e durante, para a cabeça parar de atrapalhar.' },
+      { title: 'Depender de spray ou pílula', text: 'O spray tira a sensibilidade e a pílula vira muleta. Sem eles, a insegurança volta do mesmo jeito.', help: 'Aqui o caminho é treino, não efeito temporário: o controle fica no seu corpo, não no produto.' },
+      { title: 'Começar a evitar a hora H', text: 'De tanta frustração, você passa a evitar a relação, e a distância entre vocês dois só aumenta.', help: 'Sessões curtas e discretas no celular, no seu ritmo e sem ninguém saber, para retomar a iniciativa.' },
+    ],
   },
   modulesSection: {
     title: 'O que você recebe',

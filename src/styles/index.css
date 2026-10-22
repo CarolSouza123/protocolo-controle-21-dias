@@ -64,3 +64,9 @@ body footer { background:#090d16; border-top-color:#263241 }
 .panel-table th, .panel-table td { padding:10px 8px; border-bottom:1px solid var(--border-soft); text-align:right; color:rgba(255,255,255,.85) }
 .panel-table th:first-child, .panel-table td:first-child { text-align:left }
 @media (max-width:767px) { .panel-grid { grid-template-columns:1fr } .panel-table { font-size:13px } }
+
+/* Secao de situacoes (substitui os depoimentos) */
+.card-grid.count-4 { grid-template-columns:repeat(2,1fr); max-width:960px; margin-inline:auto }
+.situation-help { margin:16px 0 0 }
+.situation-help strong { color:var(--brand-primary) }
+@media (max-width:767px) { .card-grid.count-4 { grid-template-columns:1fr } }
