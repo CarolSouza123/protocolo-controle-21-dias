@@ -7,7 +7,7 @@ export const pageContent = {
     text: 'ATENÇÃO: oferta disponível até',
   },
   hero: {
-    image: '',
+    image: '/images/mockup-hero.webp',
     imageAlt: 'Mockup do Web App na tela do celular',
     headline: 'Protocolo 21 Dias: um app com 5 minutos de treinamento por dia, para controlar a musculatura pélvica e aumentar seu tempo na cama em poucos dias',
     body: 'Para homens que querem aguentar o tempo que quiserem na cama sem precisar de pílulas azuis, sprays anestésicos ou ficar pensando em coisas chatas na hora H.',
@@ -33,13 +33,13 @@ export const pageContent = {
     subtitle: 'Seu treino diário de controle físico reunido em um só lugar',
   },
   modules: [
-    { src: '', alt: 'Imagem do Material 01', label: 'Imagem do Material 01', ratio: '1:1' as const, eyebrow: 'Material 01', title: 'O Guia de Localização do Músculo Certo', description: 'O passo a passo simples para você encontrar o músculo exato que segura a ejaculação por mais tempo e nunca mais errar contraindo a barriga ou o glúteo por engano.' },
-    { src: '', alt: 'Imagem do Material 02', label: 'Imagem do Material 02', ratio: '1:1' as const, eyebrow: 'Material 02', title: 'O Cronômetro Guiado de 5 Minutos', description: 'Você só dá o play no celular e segue a contagem automática na tela de contrair e relaxar, sem precisar contar nada na cabeça.' },
+    { src: '/images/material01.webp', alt: 'Imagem do Material 01', label: 'Imagem do Material 01', ratio: '1:1' as const, eyebrow: 'Material 01', title: 'O Guia de Localização do Músculo Certo', description: 'O passo a passo simples para você encontrar o músculo exato que segura a ejaculação por mais tempo e nunca mais errar contraindo a barriga ou o glúteo por engano.' },
+    { src: '/images/material02.webp', alt: 'Imagem do Material 02', label: 'Imagem do Material 02', ratio: '1:1' as const, eyebrow: 'Material 02', title: 'O Cronômetro Guiado de 5 Minutos', description: 'Você só dá o play no celular e segue a contagem automática na tela de contrair e relaxar, sem precisar contar nada na cabeça.' },
   ],
   bonusesSection: { title: 'Além do protocolo principal, você recebe 2 bônus exclusivos hoje' },
   bonuses: [
-    { src: '', alt: 'Imagem do bônus 01', label: 'Imagem do bônus 01', ratio: '1:1' as const, eyebrow: 'Bônus 01', title: 'O Reset da Respiração na Hora H', description: 'A técnica rápida para puxar e soltar o ar e desarmar o nervosismo assim que você sente que está chegando perto do limite.', value: '' },
-    { src: '', alt: 'Imagem do bônus 02', label: 'Imagem do bônus 02', ratio: '1:1' as const, eyebrow: 'Bônus 02', title: 'Áudio Guiado SOS Pré-Hora H', description: 'Uma faixa de 2 minutos para colocar no fone de ouvido antes do encontro, desacelerar o coração e entrar no quarto sem travar de ansiedade.', value: '' },
+    { src: '/images/bonus01.webp', alt: 'Imagem do bônus 01', label: 'Imagem do bônus 01', ratio: '1:1' as const, eyebrow: 'Bônus 01', title: 'O Reset da Respiração na Hora H', description: 'A técnica rápida para puxar e soltar o ar e desarmar o nervosismo assim que você sente que está chegando perto do limite.', value: '' },
+    { src: '/images/bonus02.webp', alt: 'Imagem do bônus 02', label: 'Imagem do bônus 02', ratio: '1:1' as const, eyebrow: 'Bônus 02', title: 'Áudio Guiado SOS Pré-Hora H', description: 'Uma faixa de 2 minutos para colocar no fone de ouvido antes do encontro, desacelerar o coração e entrar no quarto sem travar de ansiedade.', value: '' },
   ],
   offersSection: {
     title: 'Comece seu treino hoje com valor promocional',
