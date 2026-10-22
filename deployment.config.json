@@ -1,0 +1,12 @@
+{
+  "requireCheckoutLinks": true,
+  "requireMetaPixel": false,
+  "requireGoogleAnalytics": false,
+  "requireGoogleTagManager": false,
+  "requireTikTokPixel": false,
+  "requireLegalLinks": false,
+  "requireSeo": false,
+  "requireNoPlaceholders": false,
+  "maxImageSizeKb": 1500,
+  "webpQuality": 92
+}
