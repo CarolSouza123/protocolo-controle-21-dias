@@ -88,3 +88,7 @@ body footer { background:#090d16; border-top-color:#263241 }
 .funnel-fill { height:100%; border-radius:999px; transition:width .4s ease }
 .funnel-conv { display:block; margin-top:6px; color:rgba(255,255,255,.6); font-size:13px }
 .funnel-total { margin:4px 0 0; color:rgba(255,255,255,.85); font-weight:600 }
+
+/* Secao de ofertas com fundo claro: textos do card escuro seguem claros */
+#ofertas .offer-card p { color:rgba(255,255,255,.82) }
+#ofertas .offer-card h3 { color:#fff }
