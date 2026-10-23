@@ -79,15 +79,7 @@ body footer { background:#090d16; border-top-color:#263241 }
 .panel-custom-range { display:flex; gap:16px; flex-wrap:wrap; margin-top:16px }
 .panel-custom-range label { display:grid; gap:8px; color:rgba(255,255,255,.8); font-size:14px }
 .panel-custom-range input { padding:10px 12px; border:1px solid var(--border-soft); border-radius:10px; background:#090d16; color:#fff; font-size:15px; color-scheme:dark }
-.funnel { display:grid; gap:20px }
-.funnel-meta { display:flex; align-items:baseline; gap:12px; margin-bottom:8px }
-.funnel-meta span { color:rgba(255,255,255,.75); font-size:15px }
-.funnel-meta strong { color:#fff; font-size:24px; margin:0 }
-.funnel-meta em { margin-left:auto; color:#4ade80; font-style:normal; font-weight:700; font-size:18px }
-.funnel-track { height:18px; border-radius:999px; background:#090d16; overflow:hidden }
-.funnel-fill { height:100%; border-radius:999px; transition:width .4s ease }
-.funnel-conv { display:block; margin-top:6px; color:rgba(255,255,255,.6); font-size:13px }
-.funnel-total { margin:4px 0 0; color:rgba(255,255,255,.85); font-weight:600 }
+.funnel-total { margin:16px 0 0; color:rgba(255,255,255,.85); font-weight:600 }
 
 /* Secao de ofertas com fundo claro: textos do card escuro seguem claros */
 #ofertas .offer-card p { color:rgba(255,255,255,.82) }
@@ -107,3 +99,13 @@ body footer { background:#090d16; border-top-color:#263241 }
 .panel-featured { border-color:#22c55e }
 .panel-featured span { color:#4ade80; font-weight:600 }
 .panel-featured strong { font-size:44px }
+
+/* Painel: funil horizontal em formato de funil, com porcentagens */
+.hfunnel { display:flex; gap:12px; margin-top:8px }
+.hfunnel-col { flex:1; min-width:0; text-align:center }
+.hfunnel-label { color:rgba(255,255,255,.8); font-size:14px; font-weight:600; margin-bottom:10px }
+.hfunnel-stage { height:110px; display:flex; align-items:center; justify-content:center }
+.hfunnel-fill { width:100%; display:flex; align-items:center; justify-content:center; border-radius:8px; color:#fff; font-weight:700; font-size:17px }
+.hfunnel-value { margin-top:10px; color:#fff; font-size:22px; font-weight:700; line-height:1.1 }
+.hfunnel-sub { color:rgba(255,255,255,.6); font-size:12.5px; margin-top:2px }
+@media (max-width:767px) { .hfunnel-stage { height:84px } .hfunnel-fill { font-size:14px } .hfunnel-label { font-size:12.5px } }

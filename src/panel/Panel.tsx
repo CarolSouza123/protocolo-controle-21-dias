@@ -294,29 +294,38 @@ export default function Panel() {
         {ORIGIN_LABELS.map(o => <button key={o.key} type="button" className={`panel-chip${origin === o.key ? ' active' : ''}`} onClick={() => setOrigin(o.key)}>{o.label}</button>)}
       </div>
     </section>
-    <section className="panel-grid">
-      <div className="panel-card panel-featured"><span>{origin === 'bio' ? 'Visitas pela bio' : origin === 'paid' ? 'Visitas de campanhas' : 'Entradas na LP (total)'}</span><strong>{visitsOf}</strong><small>{origin === 'tudo' ? `Da bio: ${t.visits_bio} • Campanhas: ${t.visits_paid} • Outras: ${t.visits_other}` : `${pct(visitsOf, t.visits)} de todas as entradas • Total na página: ${t.visits}`}</small></div>
-      <div className="panel-card"><span>Cliques no checkout</span><strong>{clicksOf}</strong><small>{pct(clicksOf, visitsOf)} das visitas {originName}</small></div>
-      <div className="panel-card"><span>Compras lançadas</span><strong>{t.sales_qty}</strong><small>{origin === 'tudo' ? `${pct(t.sales_qty, t.checkout_clicks)} dos cliques no checkout` : 'Lançadas no geral, sem separar a origem'}</small></div>
-      <div className="panel-card"><span>Receita lançada</span><strong>{brl(t.sales_revenue)}</strong><small>Ticket médio: {t.sales_qty ? brl(t.sales_revenue / t.sales_qty) : brl(0)}</small></div>
-    </section>
     <section className="panel-card">
-      <h2>Funil do período {origin === 'bio' ? '(bio)' : origin === 'paid' ? '(campanhas)' : '(tudo)'}</h2>
+      <h2>Funil {origin === 'bio' ? 'da bio' : origin === 'paid' ? 'de campanhas' : 'do período (tudo)'}</h2>
       {visitsOf === 0 ? <p className="panel-hint">Ainda sem entradas dessa origem no período selecionado.</p> : (
-        <div className="funnel">
-          {funnelSteps.map((step, i) => (
-            <div className="funnel-row" key={step.label}>
-              <div className="funnel-meta"><span>{step.label}</span><strong>{step.value}</strong><em>{i === 0 ? '100%' : pct(step.value, visitsOf)}</em></div>
-              <div className="funnel-track"><div className="funnel-fill" style={{ width: `${visitsOf > 0 ? Math.min(100, Math.max(step.value > 0 ? 3 : 0, (step.value / visitsOf) * 100)) : 0}%`, background: step.color }} /></div>
-              {step.conv && <small className="funnel-conv">{step.conv}</small>}
-            </div>
-          ))}
+        <div>
+          <div className="hfunnel">
+            {funnelSteps.map((step, i) => {
+              const p = visitsOf > 0 ? (step.value / visitsOf) * 100 : 0
+              return (
+                <div className="hfunnel-col" key={step.label}>
+                  <div className="hfunnel-label">{step.label}</div>
+                  <div className="hfunnel-stage">
+                    <div className="hfunnel-fill" style={{ height: `${Math.max(p, step.value > 0 ? 14 : 4)}%`, background: step.color }}>{p >= 12 ? pct(step.value, visitsOf) : ''}</div>
+                  </div>
+                  <div className="hfunnel-value">{step.value}</div>
+                  <div className="hfunnel-sub">{i === 0 ? '100% das entradas' : `${pct(step.value, visitsOf)} das entradas`}</div>
+                  {step.conv && <div className="hfunnel-sub">{step.conv}</div>}
+                </div>
+              )
+            })}
+          </div>
           {origin === 'tudo'
             ? <p className="funnel-total">Conversão completa do período: {pct(t.sales_qty, t.visits)} das entradas viraram compra.</p>
             : <p className="funnel-total">Conversão {originName}: {pct(clicksOf, visitsOf)} das entradas clicaram no checkout. Compras do período (geral): {t.sales_qty}.</p>}
           {origin === 'paid' && <p className="panel-hint">Os cliques no checkout de campanhas passaram a ser contados separados agora. Antes eles entravam só no total.</p>}
         </div>
       )}
+    </section>
+    <section className="panel-grid">
+      <div className="panel-card panel-featured"><span>{origin === 'bio' ? 'Visitas pela bio' : origin === 'paid' ? 'Visitas de campanhas' : 'Entradas na LP (total)'}</span><strong>{visitsOf}</strong><small>{origin === 'tudo' ? `Da bio: ${t.visits_bio} • Campanhas: ${t.visits_paid} • Outras: ${t.visits_other}` : `${pct(visitsOf, t.visits)} de todas as entradas • Total na página: ${t.visits}`}</small></div>
+      <div className="panel-card"><span>Cliques no checkout</span><strong>{clicksOf}</strong><small>{pct(clicksOf, visitsOf)} das visitas {originName}</small></div>
+      <div className="panel-card"><span>Compras lançadas</span><strong>{t.sales_qty}</strong><small>{origin === 'tudo' ? `${pct(t.sales_qty, t.checkout_clicks)} dos cliques no checkout` : 'Lançadas no geral, sem separar a origem'}</small></div>
+      <div className="panel-card"><span>Receita lançada</span><strong>{brl(t.sales_revenue)}</strong><small>Ticket médio: {t.sales_qty ? brl(t.sales_revenue / t.sales_qty) : brl(0)}</small></div>
     </section>
     <section className="panel-card">
       <h2>Lançar venda</h2>
