@@ -4,6 +4,7 @@ type Counters = {
   visits: number; visits_bio: number; visits_paid: number; visits_other: number
   checkout_clicks: number; checkout_bio: number; checkout_paid: number; checkout_other: number
   sales_qty: number; sales_revenue: number
+  hours?: number[]; hours_bio?: number[]; hours_paid?: number[]; sales_hours?: number[]
 }
 type Day = { date: string } & Counters
 type Stats = { totals: Counters; days: Day[] }
@@ -14,13 +15,17 @@ const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', curren
 const fmtDate = (iso: string) => { const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}` }
 const todaySP = (): string => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
 const shiftDay = (iso: string, delta: number): string => { const d = new Date(`${iso}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + delta); return d.toISOString().slice(0, 10) }
-const zero: Counters = { visits: 0, visits_bio: 0, visits_paid: 0, visits_other: 0, checkout_clicks: 0, checkout_bio: 0, checkout_paid: 0, checkout_other: 0, sales_qty: 0, sales_revenue: 0 }
+const z24 = (): number[] => Array.from({ length: 24 }, () => 0)
+const sumArr = (a?: number[], b?: number[]): number[] => { const out = z24(); for (let i = 0; i < 24; i++) out[i] = (a?.[i] || 0) + (b?.[i] || 0); return out }
+const zero: Counters = { visits: 0, visits_bio: 0, visits_paid: 0, visits_other: 0, checkout_clicks: 0, checkout_bio: 0, checkout_paid: 0, checkout_other: 0, sales_qty: 0, sales_revenue: 0, hours: z24(), hours_bio: z24(), hours_paid: z24(), sales_hours: z24() }
 const sumDays = (days: Day[]): Counters => days.reduce((acc, d) => ({
   visits: acc.visits + d.visits, visits_bio: acc.visits_bio + d.visits_bio, visits_paid: acc.visits_paid + d.visits_paid,
   visits_other: acc.visits_other + d.visits_other, checkout_clicks: acc.checkout_clicks + d.checkout_clicks,
   checkout_bio: acc.checkout_bio + d.checkout_bio, checkout_paid: (acc.checkout_paid || 0) + (d.checkout_paid || 0),
   checkout_other: (acc.checkout_other || 0) + (d.checkout_other || 0), sales_qty: acc.sales_qty + d.sales_qty,
   sales_revenue: Math.round((acc.sales_revenue + d.sales_revenue) * 100) / 100,
+  hours: sumArr(acc.hours, d.hours), hours_bio: sumArr(acc.hours_bio, d.hours_bio),
+  hours_paid: sumArr(acc.hours_paid, d.hours_paid), sales_hours: sumArr(acc.sales_hours, d.sales_hours),
 }), { ...zero })
 type OriginKey = 'bio' | 'paid' | 'tudo'
 const ORIGIN_LABELS: Array<{ key: OriginKey; label: string }> = [
@@ -33,7 +38,7 @@ const RANGE_LABELS: Array<{ key: RangeKey; label: string }> = [
 ]
 
 
-type ParsedSale = { id: string; date: string; revenue: number; product: string; kind: string }
+type ParsedSale = { id: string; date: string; revenue: number; product: string; kind: string; hour: number }
 type ImportPreview = {
   fileName: string; totalRows: number; sales: ParsedSale[]; revenue: number
   ignored: Array<{ reason: string; count: number }>
@@ -85,6 +90,13 @@ const parseDateCell = (v: unknown): string => {
   const br = t.match(/^(\d{2})\/(\d{2})\/(\d{4})/); if (br) return `${br[3]}-${br[2]}-${br[1]}`
   const iso = t.match(/^(\d{4})-(\d{2})-(\d{2})/); if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`
   return ''
+}
+const parseHourCell = (v: unknown): number => {
+  if (v instanceof Date && !Number.isNaN(v.getTime())) return v.getHours()
+  const t = String(v ?? '')
+  const m = t.match(/[T ](\d{1,2}):(\d{2})/)
+  if (m) { const h = parseInt(m[1], 10); if (h >= 0 && h <= 23) return h }
+  return -1
 }
 const hashStr = (t: string): string => { let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0; return (h >>> 0).toString(16) }
 const APPROVED = ['aprovada', 'aprovado', 'paga', 'pago', 'paid', 'approved', 'concluida', 'concluido', 'completa', 'completo', 'completed', 'sucesso', 'confirmada', 'confirmado']
@@ -144,7 +156,7 @@ async function parseSalesFile(file: File): Promise<ImportPreview> {
     occurrences.set(baseKey, occ)
     const rawId = colId >= 0 ? String(row[colId] ?? '').trim() : ''
     const id = rawId ? `tx_${rawId}` : `h_${hashStr(`${baseKey}|${occ}`)}`
-    sales.push({ id, date, revenue: Math.round(revenue * 100) / 100, product: label, kind })
+    sales.push({ id, date, revenue: Math.round(revenue * 100) / 100, product: label, kind, hour: parseHourCell(row[colDate]) })
     const agg = byProductMap.get(label) || { qty: 0, revenue: 0 }
     agg.qty++; agg.revenue = Math.round((agg.revenue + revenue) * 100) / 100
     byProductMap.set(label, agg)
@@ -214,7 +226,7 @@ export default function Panel() {
       const res = await fetch('/api/import', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-admin-key': key },
-        body: JSON.stringify({ sales: preview.sales.map(x => ({ id: x.id, date: x.date, revenue: x.revenue })) }),
+        body: JSON.stringify({ sales: preview.sales.map(x => ({ id: x.id, date: x.date, revenue: x.revenue, ...(x.hour >= 0 ? { hour: x.hour } : {}) })) }),
       })
       const data = await res.json().catch(() => ({})) as { added?: number; duplicates?: number; addedRevenue?: number; totals?: Counters }
       if (!res.ok || typeof data.added !== 'number') { setImportError('Não consegui importar agora. Tenta de novo.'); return }
@@ -273,6 +285,20 @@ export default function Panel() {
     { label: 'Cliques no checkout', value: clicksOf, color: '#16a34a', conv: `${pct(clicksOf, visitsOf)} de quem entrou` },
     ...(origin === 'tudo' ? [{ label: 'Compras', value: t.sales_qty, color: '#15803d', conv: `${pct(t.sales_qty, t.checkout_clicks)} de quem clicou no checkout` }] : []),
   ]
+  const hoursOf = (origin === 'bio' ? t.hours_bio : origin === 'paid' ? t.hours_paid : t.hours) || []
+  const h24 = z24().map((_, i) => hoursOf[i] || 0)
+  const maxH = Math.max(...h24)
+  const peakHour = maxH > 0 ? h24.indexOf(maxH) : -1
+  const buys24 = z24().map((_, i) => (t.sales_hours || [])[i] || 0)
+  const WD_LABELS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+  const wdViews = [0, 0, 0, 0, 0, 0, 0]
+  const wdBuys = [0, 0, 0, 0, 0, 0, 0]
+  for (const d of viewDays) {
+    const idx = (new Date(`${d.date}T12:00:00Z`).getUTCDay() + 6) % 7
+    wdViews[idx] += origin === 'bio' ? d.visits_bio : origin === 'paid' ? d.visits_paid : d.visits
+    wdBuys[idx] += d.sales_qty
+  }
+  const maxWd = Math.max(...wdViews)
   return <main className="panel-wrap">
     <div className="panel-head">
       <h1>Painel da LP</h1>
@@ -328,6 +354,38 @@ export default function Panel() {
       <div className="panel-card"><span>Receita lançada</span><strong>{brl(t.sales_revenue)}</strong><small>Ticket médio: {t.sales_qty ? brl(t.sales_revenue / t.sales_qty) : brl(0)}</small></div>
     </section>
     <section className="panel-card">
+      <h2>Horários e dias da semana</h2>
+      <h3 className="panel-subtitle">Que horas o pessoal entra {origin === 'bio' ? 'pela bio' : origin === 'paid' ? 'pelas campanhas' : 'na página'}</h3>
+      {maxH === 0 ? <p className="panel-hint">Os horários começaram a ser contados agora. Conforme o pessoal for entrando na página, o gráfico aparece aqui sozinho, e você descobre os melhores horários pra postar.</p> : (
+        <div>
+          <div className="hours-chart">
+            {h24.map((v, h) => (
+              <div className="hour-col" key={h}>
+                <span className="hour-val">{v > 0 ? v : ''}</span>
+                <div className="hour-bar-wrap"><div className="hour-bar" style={{ height: `${Math.max((v / maxH) * 100, v > 0 ? 4 : 0)}%` }} /></div>
+                <span className="hour-lab">{h}h</span>
+                {buys24[h] > 0 && <span className="hour-buy">{buys24[h]} {buys24[h] === 1 ? 'compra' : 'compras'}</span>}
+              </div>
+            ))}
+          </div>
+          <p className="funnel-total">Horário de pico no período: {peakHour}h, com {maxH} {maxH === 1 ? 'entrada' : 'entradas'}.</p>
+          <p className="panel-hint">{buys24.some(b => b > 0) ? 'As compras marcadas em amarelo vêm das vendas importadas da Cakto que trazem a hora no arquivo.' : 'Compras por horário aparecem quando as vendas importadas da Cakto trouxerem a hora no arquivo.'}</p>
+        </div>
+      )}
+      <h3 className="panel-subtitle">Dias da semana</h3>
+      {maxWd === 0 && wdBuys.every(b => b === 0) ? <p className="panel-hint">Ainda sem movimento nos dias do período selecionado.</p> : (
+        <div>
+          {WD_LABELS.map((label, i) => (
+            <div className="wd-row" key={label}>
+              <span className="wd-name">{label}</span>
+              <div className="wd-track"><div className="wd-fill" style={{ width: `${maxWd > 0 ? Math.max((wdViews[i] / maxWd) * 100, wdViews[i] > 0 ? 3 : 0) : 0}%` }} /></div>
+              <span className="wd-nums">{wdViews[i]} {wdViews[i] === 1 ? 'entrada' : 'entradas'} • {wdBuys[i]} {wdBuys[i] === 1 ? 'compra' : 'compras'}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+    <section className="panel-card">
       <h2>Lançar venda</h2>
       <p className="panel-hint">A plataforma de pagamento não avisa o site, então lança aqui as vendas do dia. Quantidade e valor total.</p>
       <div className="panel-form">
@@ -344,6 +402,7 @@ export default function Panel() {
         {importError && <p className="panel-error">{importError}</p>}
         {preview && <div className="panel-preview">
           <p><strong>{preview.fileName}</strong>: {preview.totalRows} linhas no arquivo, <strong>{preview.sales.length} vendas aprovadas somando {brl(preview.revenue)}</strong>.</p>
+          {preview.sales.some(s => s.hour >= 0) && <p className="panel-hint">{preview.sales.filter(s => s.hour >= 0).length} dessas vendas têm o horário no arquivo e entram no gráfico de horários de compra.</p>}
           {preview.byProduct.length > 0 && <ul>{preview.byProduct.map(b => <li key={b.label}>{b.label}: {b.qty} {b.qty === 1 ? 'venda' : 'vendas'}, {brl(b.revenue)}</li>)}</ul>}
           {preview.ignored.length > 0 && <p className="panel-hint">Fora da conta: {preview.ignored.map(i => `${i.count} com ${i.reason}`).join('; ')}.</p>}
           <p className="panel-hint">{preview.columnsNote}</p>

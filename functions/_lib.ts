@@ -14,11 +14,18 @@ export interface Counters {
   checkout_other: number
   sales_qty: number
   sales_revenue: number
+  hours: number[]
+  hours_bio: number[]
+  hours_paid: number[]
+  sales_hours: number[]
 }
+
+const zeros24 = (): number[] => Array.from({ length: 24 }, () => 0)
 
 export const emptyCounters = (): Counters => ({
   visits: 0, visits_bio: 0, visits_paid: 0, visits_other: 0,
   checkout_clicks: 0, checkout_bio: 0, checkout_paid: 0, checkout_other: 0, sales_qty: 0, sales_revenue: 0,
+  hours: zeros24(), hours_bio: zeros24(), hours_paid: zeros24(), sales_hours: zeros24(),
 })
 
 export const dayKey = (date = new Date()): string => {
