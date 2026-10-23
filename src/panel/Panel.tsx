@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 type Counters = {
   visits: number; visits_bio: number; visits_paid: number; visits_other: number
-  checkout_clicks: number; checkout_bio: number; sales_qty: number; sales_revenue: number
+  checkout_clicks: number; checkout_bio: number; checkout_paid: number; checkout_other: number
+  sales_qty: number; sales_revenue: number
 }
 type Day = { date: string } & Counters
 type Stats = { totals: Counters; days: Day[] }
@@ -13,13 +14,18 @@ const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', curren
 const fmtDate = (iso: string) => { const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}` }
 const todaySP = (): string => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
 const shiftDay = (iso: string, delta: number): string => { const d = new Date(`${iso}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + delta); return d.toISOString().slice(0, 10) }
-const zero: Counters = { visits: 0, visits_bio: 0, visits_paid: 0, visits_other: 0, checkout_clicks: 0, checkout_bio: 0, sales_qty: 0, sales_revenue: 0 }
+const zero: Counters = { visits: 0, visits_bio: 0, visits_paid: 0, visits_other: 0, checkout_clicks: 0, checkout_bio: 0, checkout_paid: 0, checkout_other: 0, sales_qty: 0, sales_revenue: 0 }
 const sumDays = (days: Day[]): Counters => days.reduce((acc, d) => ({
   visits: acc.visits + d.visits, visits_bio: acc.visits_bio + d.visits_bio, visits_paid: acc.visits_paid + d.visits_paid,
   visits_other: acc.visits_other + d.visits_other, checkout_clicks: acc.checkout_clicks + d.checkout_clicks,
-  checkout_bio: acc.checkout_bio + d.checkout_bio, sales_qty: acc.sales_qty + d.sales_qty,
+  checkout_bio: acc.checkout_bio + d.checkout_bio, checkout_paid: (acc.checkout_paid || 0) + (d.checkout_paid || 0),
+  checkout_other: (acc.checkout_other || 0) + (d.checkout_other || 0), sales_qty: acc.sales_qty + d.sales_qty,
   sales_revenue: Math.round((acc.sales_revenue + d.sales_revenue) * 100) / 100,
 }), { ...zero })
+type OriginKey = 'bio' | 'paid' | 'tudo'
+const ORIGIN_LABELS: Array<{ key: OriginKey; label: string }> = [
+  { key: 'bio', label: 'Bio' }, { key: 'paid', label: 'Campanhas' }, { key: 'tudo', label: 'Tudo' },
+]
 type RangeKey = 'hoje' | 'ontem' | '7d' | '30d' | 'tudo' | 'custom'
 const RANGE_LABELS: Array<{ key: RangeKey; label: string }> = [
   { key: 'hoje', label: 'Hoje' }, { key: 'ontem', label: 'Ontem' }, { key: '7d', label: 'Últimos 7 dias' },
@@ -169,6 +175,7 @@ export default function Panel() {
   const [value, setValue] = useState('27,00')
   const [saved, setSaved] = useState('')
   const [range, setRange] = useState<RangeKey>('tudo')
+  const [origin, setOrigin] = useState<OriginKey>('bio')
   const fileRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<ImportPreview | null>(null)
   const [importError, setImportError] = useState('')
@@ -258,10 +265,13 @@ export default function Panel() {
   }
   const viewDays = stats.days.filter(d => inRange(d.date))
   const t = range === 'tudo' ? stats.totals : sumDays(viewDays)
+  const visitsOf = origin === 'bio' ? t.visits_bio : origin === 'paid' ? t.visits_paid : t.visits
+  const clicksOf = origin === 'bio' ? t.checkout_bio : origin === 'paid' ? (t.checkout_paid || 0) : t.checkout_clicks
+  const originName = origin === 'bio' ? 'pela bio' : origin === 'paid' ? 'de campanhas' : 'no total'
   const funnelSteps = [
-    { label: 'Entradas na LP', value: t.visits, color: '#22c55e', conv: '' },
-    { label: 'Cliques no checkout', value: t.checkout_clicks, color: '#16a34a', conv: `${pct(t.checkout_clicks, t.visits)} de quem entrou` },
-    { label: 'Compras', value: t.sales_qty, color: '#15803d', conv: `${pct(t.sales_qty, t.checkout_clicks)} de quem clicou no checkout` },
+    { label: origin === 'bio' ? 'Entradas pela bio' : origin === 'paid' ? 'Entradas de campanhas' : 'Entradas na LP', value: visitsOf, color: '#22c55e', conv: '' },
+    { label: 'Cliques no checkout', value: clicksOf, color: '#16a34a', conv: `${pct(clicksOf, visitsOf)} de quem entrou` },
+    ...(origin === 'tudo' ? [{ label: 'Compras', value: t.sales_qty, color: '#15803d', conv: `${pct(t.sales_qty, t.checkout_clicks)} de quem clicou no checkout` }] : []),
   ]
   return <main className="panel-wrap">
     <div className="panel-head">
@@ -278,24 +288,33 @@ export default function Panel() {
         <label>Até <input type="date" value={to} onChange={e => setTo(e.target.value)} /></label>
       </div>}
     </section>
+    <section className="panel-card panel-filters-card">
+      <span className="panel-origin-title">Origem em destaque</span>
+      <div className="panel-filters">
+        {ORIGIN_LABELS.map(o => <button key={o.key} type="button" className={`panel-chip${origin === o.key ? ' active' : ''}`} onClick={() => setOrigin(o.key)}>{o.label}</button>)}
+      </div>
+    </section>
     <section className="panel-grid">
-      <div className="panel-card"><span>Entradas na LP</span><strong>{t.visits}</strong><small>Da bio: {t.visits_bio} • Pagas: {t.visits_paid} • Outras: {t.visits_other}</small></div>
-      <div className="panel-card"><span>Cliques no checkout</span><strong>{t.checkout_clicks}</strong><small>Da bio: {t.checkout_bio} • {pct(t.checkout_clicks, t.visits)} das entradas</small></div>
-      <div className="panel-card"><span>Compras lançadas</span><strong>{t.sales_qty}</strong><small>{pct(t.sales_qty, t.checkout_clicks)} dos cliques no checkout</small></div>
+      <div className="panel-card panel-featured"><span>{origin === 'bio' ? 'Visitas pela bio' : origin === 'paid' ? 'Visitas de campanhas' : 'Entradas na LP (total)'}</span><strong>{visitsOf}</strong><small>{origin === 'tudo' ? `Da bio: ${t.visits_bio} • Campanhas: ${t.visits_paid} • Outras: ${t.visits_other}` : `${pct(visitsOf, t.visits)} de todas as entradas • Total na página: ${t.visits}`}</small></div>
+      <div className="panel-card"><span>Cliques no checkout</span><strong>{clicksOf}</strong><small>{pct(clicksOf, visitsOf)} das visitas {originName}</small></div>
+      <div className="panel-card"><span>Compras lançadas</span><strong>{t.sales_qty}</strong><small>{origin === 'tudo' ? `${pct(t.sales_qty, t.checkout_clicks)} dos cliques no checkout` : 'Lançadas no geral, sem separar a origem'}</small></div>
       <div className="panel-card"><span>Receita lançada</span><strong>{brl(t.sales_revenue)}</strong><small>Ticket médio: {t.sales_qty ? brl(t.sales_revenue / t.sales_qty) : brl(0)}</small></div>
     </section>
     <section className="panel-card">
-      <h2>Funil do período</h2>
-      {t.visits === 0 ? <p className="panel-hint">Ainda sem entradas no período selecionado.</p> : (
+      <h2>Funil do período {origin === 'bio' ? '(bio)' : origin === 'paid' ? '(campanhas)' : '(tudo)'}</h2>
+      {visitsOf === 0 ? <p className="panel-hint">Ainda sem entradas dessa origem no período selecionado.</p> : (
         <div className="funnel">
           {funnelSteps.map((step, i) => (
             <div className="funnel-row" key={step.label}>
-              <div className="funnel-meta"><span>{step.label}</span><strong>{step.value}</strong><em>{i === 0 ? '100%' : pct(step.value, t.visits)}</em></div>
-              <div className="funnel-track"><div className="funnel-fill" style={{ width: `${t.visits > 0 ? Math.max(step.value > 0 ? 3 : 0, (step.value / t.visits) * 100) : 0}%`, background: step.color }} /></div>
+              <div className="funnel-meta"><span>{step.label}</span><strong>{step.value}</strong><em>{i === 0 ? '100%' : pct(step.value, visitsOf)}</em></div>
+              <div className="funnel-track"><div className="funnel-fill" style={{ width: `${visitsOf > 0 ? Math.min(100, Math.max(step.value > 0 ? 3 : 0, (step.value / visitsOf) * 100)) : 0}%`, background: step.color }} /></div>
               {step.conv && <small className="funnel-conv">{step.conv}</small>}
             </div>
           ))}
-          <p className="funnel-total">Conversão completa do período: {pct(t.sales_qty, t.visits)} das entradas viraram compra.</p>
+          {origin === 'tudo'
+            ? <p className="funnel-total">Conversão completa do período: {pct(t.sales_qty, t.visits)} das entradas viraram compra.</p>
+            : <p className="funnel-total">Conversão {originName}: {pct(clicksOf, visitsOf)} das entradas clicaram no checkout. Compras do período (geral): {t.sales_qty}.</p>}
+          {origin === 'paid' && <p className="panel-hint">Os cliques no checkout de campanhas passaram a ser contados separados agora. Antes eles entravam só no total.</p>}
         </div>
       )}
     </section>
@@ -332,8 +351,8 @@ export default function Panel() {
       <h2>Dias do período</h2>
       {viewDays.length === 0 ? <p className="panel-hint">Ainda sem movimento registrado.</p> : (
         <table className="panel-table">
-          <thead><tr><th>Dia</th><th>Entradas</th><th>Bio</th><th>Checkout</th><th>Compras</th><th>Receita</th></tr></thead>
-          <tbody>{viewDays.map(d => <tr key={d.date}><td>{fmtDate(d.date)}</td><td>{d.visits}</td><td>{d.visits_bio}</td><td>{d.checkout_clicks}</td><td>{d.sales_qty}</td><td>{brl(d.sales_revenue)}</td></tr>)}</tbody>
+          <thead><tr><th>Dia</th><th>Entradas</th><th>Bio</th><th>Campanhas</th><th>Checkout</th><th>Compras</th><th>Receita</th></tr></thead>
+          <tbody>{viewDays.map(d => <tr key={d.date}><td>{fmtDate(d.date)}</td><td>{d.visits}</td><td>{d.visits_bio}</td><td>{d.visits_paid}</td><td>{d.checkout_clicks}</td><td>{d.sales_qty}</td><td>{brl(d.sales_revenue)}</td></tr>)}</tbody>
         </table>
       )}
     </section>

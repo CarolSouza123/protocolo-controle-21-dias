@@ -18,6 +18,8 @@ export const onRequestPost = async ({ request, env }: PagesCtx): Promise<Respons
     await bump(env.TRACK_KV, c => {
       c.checkout_clicks += 1
       if (origin === 'bio') c.checkout_bio += 1
+      else if (origin === 'paid') c.checkout_paid += 1
+      else c.checkout_other += 1
     })
     return json({ ok: true })
   }

@@ -10,13 +10,15 @@ export interface Counters {
   visits_other: number
   checkout_clicks: number
   checkout_bio: number
+  checkout_paid: number
+  checkout_other: number
   sales_qty: number
   sales_revenue: number
 }
 
 export const emptyCounters = (): Counters => ({
   visits: 0, visits_bio: 0, visits_paid: 0, visits_other: 0,
-  checkout_clicks: 0, checkout_bio: 0, sales_qty: 0, sales_revenue: 0,
+  checkout_clicks: 0, checkout_bio: 0, checkout_paid: 0, checkout_other: 0, sales_qty: 0, sales_revenue: 0,
 })
 
 export const dayKey = (date = new Date()): string => {
