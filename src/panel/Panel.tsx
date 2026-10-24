@@ -288,9 +288,12 @@ export default function Panel() {
   const hoursOf = (origin === 'bio' ? t.hours_bio : origin === 'paid' ? t.hours_paid : t.hours) || []
   const h24 = z24().map((_, i) => hoursOf[i] || 0)
   const maxH = Math.max(...h24)
-  const peakHour = maxH > 0 ? h24.indexOf(maxH) : -1
+  const sumH = h24.reduce((a, b) => a + b, 0)
+  const unrecorded = Math.max(visitsOf - sumH, 0)
+  const peakHours = maxH > 0 ? h24.map((v, i) => (v === maxH ? i : -1)).filter(i => i >= 0) : []
   const buys24 = z24().map((_, i) => (t.sales_hours || [])[i] || 0)
   const WD_LABELS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+  const WD_SHORT = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
   const wdViews = [0, 0, 0, 0, 0, 0, 0]
   const wdBuys = [0, 0, 0, 0, 0, 0, 0]
   for (const d of viewDays) {
@@ -356,30 +359,41 @@ export default function Panel() {
     <section className="panel-card">
       <h2>Horários e dias da semana</h2>
       <h3 className="panel-subtitle">Que horas o pessoal entra {origin === 'bio' ? 'pela bio' : origin === 'paid' ? 'pelas campanhas' : 'na página'}</h3>
-      {maxH === 0 ? <p className="panel-hint">Os horários começaram a ser contados agora. Conforme o pessoal for entrando na página, o gráfico aparece aqui sozinho, e você descobre os melhores horários pra postar.</p> : (
+      {visitsOf === 0 ? <p className="panel-hint">Ainda sem entradas dessa origem no período selecionado.</p> : (
         <div>
-          <div className="hours-chart">
+          <div className="hours-chart hours-chart-hours">
             {h24.map((v, h) => (
               <div className="hour-col" key={h}>
                 <span className="hour-val">{v > 0 ? v : ''}</span>
-                <div className="hour-bar-wrap"><div className="hour-bar" style={{ height: `${Math.max((v / maxH) * 100, v > 0 ? 4 : 0)}%` }} /></div>
+                <div className="hour-bar-wrap"><div className="hour-bar" style={{ height: `${maxH > 0 ? Math.max((v / maxH) * 100, v > 0 ? 4 : 0) : 0}%` }} /></div>
                 <span className="hour-lab">{h}h</span>
                 {buys24[h] > 0 && <span className="hour-buy">{buys24[h]} {buys24[h] === 1 ? 'compra' : 'compras'}</span>}
               </div>
             ))}
+            {unrecorded > 0 && (
+              <div className="hour-col hour-unknown">
+                <span className="hour-val">{unrecorded}</span>
+                <div className="hour-bar-wrap"><div className="hour-bar hour-bar-unknown" style={{ height: `${maxH > 0 ? Math.max((unrecorded / maxH) * 100, 4) : 100}%` }} /></div>
+                <span className="hour-lab">s/ hora</span>
+              </div>
+            )}
           </div>
-          <p className="funnel-total">Horário de pico no período: {peakHour}h, com {maxH} {maxH === 1 ? 'entrada' : 'entradas'}.</p>
+          {maxH > 0
+            ? <p className="funnel-total">{peakHours.length === 1 ? `Horário de pico no período: ${peakHours[0]}h, com ${maxH} ${maxH === 1 ? 'entrada' : 'entradas'}.` : `Horários de pico no período: ${peakHours.map(h => `${h}h`).join(' e ')}, com ${maxH} entradas cada.`}</p>
+            : <p className="funnel-total">Nenhuma entrada deste período tem horário registrado.</p>}
+          {unrecorded > 0 && <p className="panel-hint">As {unrecorded} {unrecorded === 1 ? 'entrada marcada' : 'entradas marcadas'} como s/ hora são de antes de a gravação de horários começar. Somando as barras com essa coluna, o total bate com as entradas do período.</p>}
           <p className="panel-hint">{buys24.some(b => b > 0) ? 'As compras marcadas em amarelo vêm das vendas importadas da Cakto que trazem a hora no arquivo.' : 'Compras por horário aparecem quando as vendas importadas da Cakto trouxerem a hora no arquivo.'}</p>
         </div>
       )}
       <h3 className="panel-subtitle">Dias da semana</h3>
       {maxWd === 0 && wdBuys.every(b => b === 0) ? <p className="panel-hint">Ainda sem movimento nos dias do período selecionado.</p> : (
-        <div>
+        <div className="hours-chart">
           {WD_LABELS.map((label, i) => (
-            <div className="wd-row" key={label}>
-              <span className="wd-name">{label}</span>
-              <div className="wd-track"><div className="wd-fill" style={{ width: `${maxWd > 0 ? Math.max((wdViews[i] / maxWd) * 100, wdViews[i] > 0 ? 3 : 0) : 0}%` }} /></div>
-              <span className="wd-nums">{wdViews[i]} {wdViews[i] === 1 ? 'entrada' : 'entradas'} • {wdBuys[i]} {wdBuys[i] === 1 ? 'compra' : 'compras'}</span>
+            <div className="hour-col" key={label}>
+              <span className="hour-val">{wdViews[i] > 0 ? wdViews[i] : ''}</span>
+              <div className="hour-bar-wrap"><div className="hour-bar" style={{ height: `${maxWd > 0 ? Math.max((wdViews[i] / maxWd) * 100, wdViews[i] > 0 ? 4 : 0) : 0}%` }} /></div>
+              <span className="hour-lab">{WD_SHORT[i]}</span>
+              {wdBuys[i] > 0 && <span className="hour-buy">{wdBuys[i]} {wdBuys[i] === 1 ? 'compra' : 'compras'}</span>}
             </div>
           ))}
         </div>
