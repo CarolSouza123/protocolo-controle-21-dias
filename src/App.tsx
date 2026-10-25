@@ -31,9 +31,13 @@ const isCopyPage = () => window.location.pathname.replace(/\/$/, '').startsWith(
 const currentContent = () => (isCopyPage() ? pageContentB : pageContentA)
 
 function UrgencyBar() {
-  const formatDate = () => new Intl.DateTimeFormat('pt-BR', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  }).format(new Date())
+  const bar = currentContent().urgencyBar
+  // A versão B mostra a faixa sem o ano, só dia e mês atual. A original não muda.
+  const hideYear = 'hideYear' in bar ? bar.hideYear : false
+  const formatDate = () => new Intl.DateTimeFormat('pt-BR', hideYear
+    ? { day: 'numeric', month: 'long' }
+    : { day: 'numeric', month: 'long', year: 'numeric' },
+  ).format(new Date())
   const [localDate, setLocalDate] = useState(formatDate)
 
   useEffect(() => {

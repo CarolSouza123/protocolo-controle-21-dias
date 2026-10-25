@@ -6,11 +6,12 @@
 
 export const pageContentB = {
   urgencyBar: {
-    enabled: false,
-    text: '',
+    enabled: true,
+    text: 'ATENÇÃO: oferta disponível até',
+    hideYear: true,
   },
   hero: {
-    eyebrow: 'EXCLUSIVO PARA HOMENS',
+    eyebrow: '',
     image: '/images/mockup-hero.webp',
     imageAlt: 'Mockup do Web App na tela do celular',
     headline: 'Você tenta segurar, fica tenso e acaba antes do que gostaria?',
