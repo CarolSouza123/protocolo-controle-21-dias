@@ -85,15 +85,15 @@ export const pageContentB = {
     },
     complete: {
       badge: '', title: 'Protocolo 21 Dias + Bônus Inclusos',
-      subtitle: 'Tenha acesso ao Protocolo 21 Dias e aos dois bônus complementares.',
+      subtitle: 'Tudo o que você precisa para assumir o controle na cama.',
       items: [
-        { label: 'Bônus 01: Guia de Localização do Músculo Certo' },
-        { label: 'Bônus 02: Cronômetro Guiado de 5 Minutos' },
-        { label: 'Bônus 03: Reset da Respiração na Hora H' },
-        { label: 'Bônus 04: Áudio Guiado SOS Pré-Hora H' },
-        { label: 'Acesso digital pelo celular' },
+        { label: 'Guia de Localização do Músculo Certo' },
+        { label: 'App do Protocolo completo' },
+        { label: 'Bônus 01: O Reset da Respiração na Hora H' },
+        { label: 'Bônus 02: Áudio Guiado SOS Pré-Hora H' },
+        { label: 'Acesso digital imediato no seu celular' },
       ],
-      previousPrice: 'R$ 67,00', installmentCount: 0, installmentValue: '', cashValue: 'R$ 27,00', ctaLabel: 'QUERO ACESSAR O PROTOCOLO',
+      previousPrice: 'R$ 67,00', installmentCount: 6, installmentValue: 'R$ 5,39', cashValue: 'R$ 27,00', ctaLabel: 'Quero durar mais',
     },
     popup: {
       eyebrow: 'Espere! Não saia ainda...',
