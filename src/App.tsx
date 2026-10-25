@@ -8,6 +8,7 @@ import { theme } from './config/theme'
 import { withAttributionParams } from './utils/attribution'
 import { trackCheckout, trackVisitOnce } from './utils/panel'
 import Panel from './panel/Panel'
+import TestimonialsCarousel from './components/TestimonialsCarousel'
 
 const placeholder = (item: MediaItem, priority = false) => item.src ? (
   <img src={item.src} alt={item.alt} loading={priority ? 'eager' : 'lazy'} fetchPriority={priority ? 'high' : 'auto'} />
@@ -49,7 +50,7 @@ function Price({ data }: { data: { previousPrice: string; installmentCount: numb
   const ready = data.previousPrice || data.installmentValue || data.cashValue
   return <div className="price" aria-label={ready ? 'Preço da oferta' : 'Preço a definir'}>
     <span className="price-before"><s>{data.previousPrice ? `De ${data.previousPrice}` : 'Preço anterior a definir'}</s> por apenas</span>
-    <strong>{data.installmentCount && data.installmentValue ? `${data.installmentCount}x de ${data.installmentValue}` : 'Preço a definir'}</strong>
+    {data.installmentCount && data.installmentValue ? <strong>{`${data.installmentCount}x de ${data.installmentValue}`}</strong> : null}
     <span>ou <b>{data.cashValue || 'valor a definir'}</b> à vista no PIX</span>
   </div>
 }
@@ -79,6 +80,7 @@ function App() {
   const [faqOpen, setFaqOpen] = useState<number | null>(0)
   const c = currentContent()
   const variant = isCopyPage() ? 'b' : 'a'
+  const testimonials = (c as { testimonials?: { title: string; subtitle: string; items: string[] } }).testimonials
   useEffect(() => {
     trackVisitOnce(variant)
     document.title = seo.title
@@ -104,9 +106,10 @@ function App() {
   return <>
     <UrgencyBar />
     <main>
-      <section className="hero"><div className="container hero-inner"><div className="hero-media">{placeholder({ src: c.hero.image, alt: c.hero.imageAlt, label: 'Mockup do Web App na tela do celular', ratio: '3:2' }, true)}</div><h1>{c.hero.headline}</h1><p className="lead">{c.hero.body}</p>{c.hero.bullets && <ul className="hero-bullets">{c.hero.bullets.map(b => <li key={b}><Check aria-hidden="true" /><span>{b}</span></li>)}</ul>}<div className="hero-action"><Button onClick={() => document.getElementById('ofertas')?.scrollIntoView({ behavior: 'smooth' })}>{c.hero.ctaLabel}</Button><img src={c.hero.securityImage} alt={c.hero.securityImageAlt} /></div></div></section>
-      <section className="section section-muted"><div className="container"><h2>{c.situations.title}</h2><p className="section-subtitle">{c.situations.subtitle}</p><div className="card-grid count-4 situations-grid">{c.situations.items.map(item => <article className="content-card situation" key={item.title}><h3>{item.title}</h3><p>{item.text}</p><p className="situation-help"><strong>Como o protocolo ajuda:</strong> {item.help}</p></article>)}</div></div></section>
-      <section className="section"><div className="container"><h2>{c.modulesSection.title}</h2>{'subtitle' in c.modulesSection && c.modulesSection.subtitle && <p className="section-subtitle">{c.modulesSection.subtitle}</p>}<Modules /></div></section>
+      <section className="hero"><div className="container hero-inner"><div className="hero-media">{placeholder({ src: c.hero.image, alt: c.hero.imageAlt, label: 'Mockup do Web App na tela do celular', ratio: '3:2' }, true)}</div>{'eyebrow' in c.hero && c.hero.eyebrow ? <span className="hero-eyebrow">{c.hero.eyebrow}</span> : null}<h1>{c.hero.headline}</h1><p className="lead">{c.hero.body}</p>{c.hero.bullets && <ul className="hero-bullets">{c.hero.bullets.map(b => <li key={b}><Check aria-hidden="true" /><span>{b}</span></li>)}</ul>}<div className="hero-action"><Button onClick={() => document.getElementById('ofertas')?.scrollIntoView({ behavior: 'smooth' })}>{c.hero.ctaLabel}</Button><img src={c.hero.securityImage} alt={c.hero.securityImageAlt} /></div></div></section>
+      <section className="section section-muted"><div className="container"><h2>{c.situations.title}</h2>{c.situations.subtitle ? <p className="section-subtitle">{c.situations.subtitle}</p> : null}<div className={`card-grid count-${c.situations.items.length} situations-grid`}>{(c.situations.items as Array<{ eyebrow?: string; title: string; text: string; help?: string }>).map(item => <article className="content-card situation" key={item.title}>{item.eyebrow ? <span className="eyebrow">{item.eyebrow}</span> : null}<h3>{item.title}</h3><p>{item.text}</p>{item.help ? <p className="situation-help"><strong>Como o protocolo ajuda:</strong> {item.help}</p> : null}</article>)}</div>{'closing' in c.situations && c.situations.closing ? <p className="situations-closing">{c.situations.closing}</p> : null}</div></section>
+      <section className="section"><div className="container"><h2>{c.modulesSection.title}</h2>{'subtitle' in c.modulesSection && c.modulesSection.subtitle && <p className="section-subtitle">{c.modulesSection.subtitle}</p>}<Modules />{'closingLabel' in c.modulesSection && c.modulesSection.closingLabel ? <p className="modules-closing"><strong>{c.modulesSection.closingLabel}:</strong> {c.modulesSection.closingText}</p> : null}</div></section>
+      {isCopyPage() && testimonials ? <section className="section section-muted"><div className="container"><h2>{testimonials.title}</h2><p className="section-subtitle">{testimonials.subtitle}</p><TestimonialsCarousel items={testimonials.items} /></div></section> : null}
       <section className="section section-muted"><div className="container"><h2>{c.bonusesSection.title}</h2><div className={`card-grid count-${c.bonuses.length}`}>{c.bonuses.map(item => <article className="content-card bonus" key={item.eyebrow}><div className="square-media">{placeholder(item)}</div><span className="eyebrow">🎁 {item.eyebrow}: incluso na oferta</span><h3>{item.title}</h3><p>{item.description}</p>{item.value && <s>{item.value}</s>}</article>)}</div></div></section>
       <section className="section section-light" id="ofertas"><div className="container"><h2>{c.offersSection.title}</h2><div className="offers offers-single">
         <article className="offer-card featured">{c.offers.complete.badge && <span className="offer-badge">{c.offers.complete.badge}</span>}<h3>{c.offers.complete.title}</h3>{'subtitle' in c.offers.complete && c.offers.complete.subtitle && <p className="offer-subtitle">{c.offers.complete.subtitle}</p>}<FeatureList items={c.offers.complete.items} /><Price data={c.offers.complete} /><div className="offer-action"><Button onClick={() => trackCheckout(variant)} href={(isCopyPage() ? links.checkoutCopy || links.checkoutComplete : links.checkoutComplete) ? withAttributionParams(isCopyPage() ? links.checkoutCopy || links.checkoutComplete : links.checkoutComplete) : links.checkoutSimple ? withAttributionParams(links.checkoutSimple) : undefined}>{c.offers.complete.ctaLabel}</Button><img src={c.offersSection.paymentSecurityImage} alt={c.offersSection.paymentSecurityAlt} loading="lazy" /></div></article>

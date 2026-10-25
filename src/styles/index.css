@@ -94,6 +94,16 @@ body footer { background:#090d16; border-top-color:#263241 }
 .panel-preview ul { margin:8px 0; padding-left:20px; color:rgba(255,255,255,.85) }
 .panel-cancel { background:transparent !important; border:1px solid var(--border-soft) !important; color:#fff !important }
 
+/* Versão B: eyebrow da hero, fechamentos de seção e carrossel de prova social */
+.hero-eyebrow { display:block; color:#22c55e; font-weight:700; font-size:14px; letter-spacing:.08em; margin-bottom:12px }
+.situations-closing { max-width:720px; margin:24px auto 0; text-align:center; color:rgba(255,255,255,.85); font-size:18px }
+.modules-closing { max-width:720px; margin:24px auto 0; text-align:center; color:rgba(255,255,255,.85); font-size:18px }
+.testimonials-track { display:flex; gap:24px; overflow-x:auto; scrollbar-width:none; touch-action:pan-y; user-select:none; cursor:grab; padding-bottom:4px }
+.testimonials-track::-webkit-scrollbar { display:none }
+.testimonial-card { flex:0 0 220px; aspect-ratio:2/3; border:1px dashed rgba(255,255,255,.3); border-radius:16px; background:#1f2937; overflow:hidden }
+.testimonial-card img { width:100%; height:100%; object-fit:cover; display:block }
+@media (max-width:767px) { .testimonial-card { flex-basis:75% } }
+
 /* Painel: origem em destaque */
 .panel-origin-title { display:block; color:rgba(255,255,255,.85); font-weight:600; font-size:14px; margin-bottom:12px }
 .panel-featured { border-color:#22c55e }
