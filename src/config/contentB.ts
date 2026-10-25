@@ -1,6 +1,8 @@
 // Copy de teste (versão B), servida em /copy/bio.
 // Textos enviados pela Caroline em 24/10/2026. A copy original não é tocada.
-// A seção de prova social começa com os cards vazios; os depoimentos reais entram depois.
+// No lugar da prova social, por enquanto, vai o bloco de situações da original;
+// o carrossel de depoimentos (src/components/TestimonialsCarousel.tsx) fica guardado
+// para quando os depoimentos reais chegarem.
 
 export const pageContentB = {
   urgencyBar: {
