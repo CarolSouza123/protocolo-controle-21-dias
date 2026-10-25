@@ -104,6 +104,7 @@ body footer { background:#090d16; border-top-color:#263241 }
 /* Versão B: eyebrow da hero, fechamentos de seção e carrossel de prova social */
 .hero-eyebrow { display:block; color:#22c55e; font-weight:700; font-size:14px; letter-spacing:.08em; margin-bottom:12px }
 .situations-closing { max-width:720px; margin:24px auto 0; text-align:center; color:rgba(255,255,255,.85); font-size:18px }
+.situations-image { display:block; width:100%; max-width:760px; margin:0 auto 32px; border-radius:16px }
 .modules-closing { max-width:720px; margin:24px auto 0; text-align:center; color:rgba(255,255,255,.85); font-size:18px }
 .testimonials-track { display:flex; gap:24px; overflow-x:auto; scrollbar-width:none; touch-action:pan-y; user-select:none; cursor:grab; padding-bottom:4px }
 .testimonials-track::-webkit-scrollbar { display:none }

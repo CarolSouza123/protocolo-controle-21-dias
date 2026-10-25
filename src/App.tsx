@@ -10,12 +10,12 @@ import { trackCheckout, trackVisitOnce } from './utils/panel'
 import Panel from './panel/Panel'
 
 type SituationItem = { eyebrow?: string; title: string; text: string; help?: string }
-type SituationsData = { title: string; subtitle?: string; items: SituationItem[]; closing?: string }
+type SituationsData = { title: string; subtitle?: string; image?: string; imageAlt?: string; items: SituationItem[]; closing?: string }
 
 // O mesmo bloco de situações da original. Na versão B ele ocupa, por enquanto,
 // o lugar da prova social, até os depoimentos reais chegarem.
 function SituationsSection({ s }: { s: SituationsData }) {
-  return <section className="section section-muted"><div className="container"><h2>{s.title}</h2>{s.subtitle ? <p className="section-subtitle">{s.subtitle}</p> : null}<div className={`card-grid count-${s.items.length} situations-grid`}>{s.items.map(item => <article className="content-card situation" key={item.title}>{item.eyebrow ? <span className="eyebrow">{item.eyebrow}</span> : null}<h3>{item.title}</h3><p>{item.text}</p>{item.help ? <p className="situation-help"><strong>Como o protocolo ajuda:</strong> {item.help}</p> : null}</article>)}</div>{s.closing ? <p className="situations-closing">{s.closing}</p> : null}</div></section>
+  return <section className="section section-muted"><div className="container"><h2>{s.title}</h2>{s.subtitle ? <p className="section-subtitle">{s.subtitle}</p> : null}{s.image ? <img className="situations-image" src={s.image} alt={s.imageAlt || ''} loading="lazy" /> : null}<div className={`card-grid count-${s.items.length} situations-grid`}>{s.items.map(item => <article className="content-card situation" key={item.title}>{item.eyebrow ? <span className="eyebrow">{item.eyebrow}</span> : null}<h3>{item.title}</h3><p>{item.text}</p>{item.help ? <p className="situation-help"><strong>Como o protocolo ajuda:</strong> {item.help}</p> : null}</article>)}</div>{s.closing ? <p className="situations-closing">{s.closing}</p> : null}</div></section>
 }
 
 const placeholder = (item: MediaItem, priority = false) => item.src ? (

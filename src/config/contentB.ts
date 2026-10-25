@@ -14,8 +14,8 @@ export const pageContentB = {
   },
   hero: {
     eyebrow: '',
-    image: '/images/mockup-hero.webp',
-    imageAlt: 'Mockup do Web App na tela do celular',
+    image: '/images/mockup-hero-b.webp',
+    imageAlt: 'Mockup do Web App em três telas: treino, progresso e bônus',
     headline: 'Você tenta segurar, fica tenso e acaba antes do que gostaria?',
     body: 'Um protocolo digital com treinos guiados de 5 minutos para praticar o controle muscular e a respiração durante 21 dias.',
     bullets: [
@@ -30,6 +30,8 @@ export const pageContentB = {
   situations: {
     title: 'Você já tentou resolver isso de outras formas?',
     subtitle: '',
+    image: '/images/dor-foto.webp',
+    imageAlt: 'Homem tenso sentado na beira da cama em quarto escuro',
     items: [
       { eyebrow: '01', title: 'Tentar segurar', text: 'Você fica pensando em não terminar e acaba ainda mais rápido por conta da ansiedade.' },
       { eyebrow: '02', title: 'Comprimidos ou sprays', text: 'Você procura uma solução prática, mas não quer depender disso.' },
