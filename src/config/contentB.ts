@@ -39,6 +39,16 @@ export const pageContentB = {
     ],
     closing: 'A proposta do Protocolo 21 Dias: reunir exercícios guiados e recursos de respiração em uma rotina organizada, direto no celular.',
   },
+  // Prova social da versão B: copy própria da seção Feito, sem tocar na situations da original.
+  proofSituations: {
+    title: 'Feito para homens que vivem isso',
+    subtitle: '',
+    items: [
+      { title: 'Acaba antes da parceira', text: 'Ela mal começou a entrar no ritmo e você já não aguenta mais.', help: 'Treino diário de 5 minutos que condiciona o músculo do controle, dia após dia.' },
+      { title: 'A cabeça não desliga', text: 'Em vez de curtir o momento, você fica de olho no tempo, com medo de falhar de novo.', help: 'A aba de respiração do app ensina a baixar a ansiedade antes e durante, para poder aproveitar.' },
+      { title: 'Usam spray ou pílula', text: 'O spray tira a sensibilidade e a pílula vira muleta. Sem eles, a insegurança volta do mesmo jeito.', help: 'Aqui o caminho é treino, e efeito é duradouro: o controle fica no seu corpo, não no produto.' },
+    ],
+  },
   modulesSection: {
     title: '21 dias. Treinos de 5 minutos. Tudo no celular.',
     subtitle: 'Um programa digital para organizar sua prática e ajudar você a desenvolver consciência corporal e mais confiança na intimidade.',
