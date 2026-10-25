@@ -51,11 +51,13 @@ export async function loadCounters(kv: KVNamespace, key: string): Promise<Counte
   }
 }
 
-export async function bump(kv: KVNamespace, fn: (c: Counters) => void, dateKey?: string): Promise<void> {
+export async function bump(kv: KVNamespace, fn: (c: Counters) => void, dateKey?: string, variant?: string): Promise<void> {
   const day = dateKey || dayKey()
-  const [d, t] = await Promise.all([loadCounters(kv, `d:${day}`), loadCounters(kv, 'total')])
+  const dayStore = variant === 'b' ? `d:${day}:b` : `d:${day}`
+  const totalStore = variant === 'b' ? 'total:b' : 'total'
+  const [d, t] = await Promise.all([loadCounters(kv, dayStore), loadCounters(kv, totalStore)])
   fn(d); fn(t)
-  await Promise.all([kv.put(`d:${day}`, JSON.stringify(d)), kv.put('total', JSON.stringify(t))])
+  await Promise.all([kv.put(dayStore, JSON.stringify(d)), kv.put(totalStore, JSON.stringify(t))])
 }
 
 export function checkKey(request: Request, env: Env): Response | null {

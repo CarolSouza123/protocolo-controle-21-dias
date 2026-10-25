@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Check, Minus, Plus } from 'lucide-react'
-import { pageContent, type MediaItem } from './config/content'
+import { pageContent as pageContentA, type MediaItem } from './config/content'
+import { pageContentB } from './config/contentB'
 import { links } from './config/links'
 import { seo } from './config/seo'
 import { theme } from './config/theme'
@@ -16,6 +17,9 @@ function Button({ children, onClick, href, kind = 'primary' }: { children: React
   const className = `button button-${kind}`
   return href ? <a className={className} href={href} onClick={onClick}>{children}</a> : <button className={className} type="button" onClick={onClick}>{children}</button>
 }
+
+const isCopyPage = () => window.location.pathname.replace(/\/$/, '').startsWith('/copy')
+const currentContent = () => (isCopyPage() ? pageContentB : pageContentA)
 
 function UrgencyBar() {
   const formatDate = () => new Intl.DateTimeFormat('pt-BR', {
@@ -37,8 +41,8 @@ function UrgencyBar() {
     return () => clearTimeout(timer)
   }, [])
 
-  if (!pageContent.urgencyBar.enabled) return null
-  return <div className="urgency">{pageContent.urgencyBar.text} {localDate}</div>
+  if (!currentContent().urgencyBar.enabled) return null
+  return <div className="urgency">{currentContent().urgencyBar.text} {localDate}</div>
 }
 
 function Price({ data }: { data: { previousPrice: string; installmentCount: number; installmentValue: string; cashValue: string } }) {
@@ -53,7 +57,7 @@ function Price({ data }: { data: { previousPrice: string; installmentCount: numb
 function Modules() {
   const [open, setOpen] = useState<number[]>([])
   const toggle = (index: number) => setOpen(old => old.includes(index) ? old.filter(item => item !== index) : [...old, index])
-  return <div className={`card-grid count-${pageContent.modules.length}`}>{pageContent.modules.map((item, index) => {
+  return <div className={`card-grid count-${currentContent().modules.length}`}>{currentContent().modules.map((item, index) => {
     const expanded = open.includes(index)
     return <article className="content-card" key={item.eyebrow}>
       <div className="square-media">{placeholder(item)}</div><span className="eyebrow">{item.eyebrow}</span><h3>{item.title}</h3>
@@ -73,8 +77,10 @@ const FeatureList = ({ items }: { items: readonly FeatureItem[] }) => <ul classN
 
 function App() {
   const [faqOpen, setFaqOpen] = useState<number | null>(0)
+  const c = currentContent()
+  const variant = isCopyPage() ? 'b' : 'a'
   useEffect(() => {
-    trackVisitOnce()
+    trackVisitOnce(variant)
     document.title = seo.title
     const setMeta = (attribute: 'name' | 'property', key: string, content: string) => {
       if (!content) return
@@ -98,17 +104,17 @@ function App() {
   return <>
     <UrgencyBar />
     <main>
-      <section className="hero"><div className="container hero-inner"><div className="hero-media">{placeholder({ src: pageContent.hero.image, alt: pageContent.hero.imageAlt, label: 'Mockup do Web App na tela do celular', ratio: '3:2' }, true)}</div><h1>{pageContent.hero.headline}</h1><p className="lead">{pageContent.hero.body}</p>{pageContent.hero.bullets && <ul className="hero-bullets">{pageContent.hero.bullets.map(b => <li key={b}><Check aria-hidden="true" /><span>{b}</span></li>)}</ul>}<div className="hero-action"><Button onClick={() => document.getElementById('ofertas')?.scrollIntoView({ behavior: 'smooth' })}>{pageContent.hero.ctaLabel}</Button><img src={pageContent.hero.securityImage} alt={pageContent.hero.securityImageAlt} /></div></div></section>
-      <section className="section section-muted"><div className="container"><h2>{pageContent.situations.title}</h2><p className="section-subtitle">{pageContent.situations.subtitle}</p><div className="card-grid count-4 situations-grid">{pageContent.situations.items.map(item => <article className="content-card situation" key={item.title}><h3>{item.title}</h3><p>{item.text}</p><p className="situation-help"><strong>Como o protocolo ajuda:</strong> {item.help}</p></article>)}</div></div></section>
-      <section className="section"><div className="container"><h2>{pageContent.modulesSection.title}</h2>{'subtitle' in pageContent.modulesSection && pageContent.modulesSection.subtitle && <p className="section-subtitle">{pageContent.modulesSection.subtitle}</p>}<Modules /></div></section>
-      <section className="section section-muted"><div className="container"><h2>{pageContent.bonusesSection.title}</h2><div className={`card-grid count-${pageContent.bonuses.length}`}>{pageContent.bonuses.map(item => <article className="content-card bonus" key={item.eyebrow}><div className="square-media">{placeholder(item)}</div><span className="eyebrow">🎁 {item.eyebrow}: incluso na oferta</span><h3>{item.title}</h3><p>{item.description}</p>{item.value && <s>{item.value}</s>}</article>)}</div></div></section>
-      <section className="section section-light" id="ofertas"><div className="container"><h2>{pageContent.offersSection.title}</h2><div className="offers offers-single">
-        <article className="offer-card featured">{pageContent.offers.complete.badge && <span className="offer-badge">{pageContent.offers.complete.badge}</span>}<h3>{pageContent.offers.complete.title}</h3>{'subtitle' in pageContent.offers.complete && pageContent.offers.complete.subtitle && <p className="offer-subtitle">{pageContent.offers.complete.subtitle}</p>}<FeatureList items={pageContent.offers.complete.items} /><Price data={pageContent.offers.complete} /><div className="offer-action"><Button onClick={trackCheckout} href={links.checkoutComplete ? withAttributionParams(links.checkoutComplete) : links.checkoutSimple ? withAttributionParams(links.checkoutSimple) : undefined}>{pageContent.offers.complete.ctaLabel}</Button><img src={pageContent.offersSection.paymentSecurityImage} alt={pageContent.offersSection.paymentSecurityAlt} loading="lazy" /></div></article>
+      <section className="hero"><div className="container hero-inner"><div className="hero-media">{placeholder({ src: c.hero.image, alt: c.hero.imageAlt, label: 'Mockup do Web App na tela do celular', ratio: '3:2' }, true)}</div><h1>{c.hero.headline}</h1><p className="lead">{c.hero.body}</p>{c.hero.bullets && <ul className="hero-bullets">{c.hero.bullets.map(b => <li key={b}><Check aria-hidden="true" /><span>{b}</span></li>)}</ul>}<div className="hero-action"><Button onClick={() => document.getElementById('ofertas')?.scrollIntoView({ behavior: 'smooth' })}>{c.hero.ctaLabel}</Button><img src={c.hero.securityImage} alt={c.hero.securityImageAlt} /></div></div></section>
+      <section className="section section-muted"><div className="container"><h2>{c.situations.title}</h2><p className="section-subtitle">{c.situations.subtitle}</p><div className="card-grid count-4 situations-grid">{c.situations.items.map(item => <article className="content-card situation" key={item.title}><h3>{item.title}</h3><p>{item.text}</p><p className="situation-help"><strong>Como o protocolo ajuda:</strong> {item.help}</p></article>)}</div></div></section>
+      <section className="section"><div className="container"><h2>{c.modulesSection.title}</h2>{'subtitle' in c.modulesSection && c.modulesSection.subtitle && <p className="section-subtitle">{c.modulesSection.subtitle}</p>}<Modules /></div></section>
+      <section className="section section-muted"><div className="container"><h2>{c.bonusesSection.title}</h2><div className={`card-grid count-${c.bonuses.length}`}>{c.bonuses.map(item => <article className="content-card bonus" key={item.eyebrow}><div className="square-media">{placeholder(item)}</div><span className="eyebrow">🎁 {item.eyebrow}: incluso na oferta</span><h3>{item.title}</h3><p>{item.description}</p>{item.value && <s>{item.value}</s>}</article>)}</div></div></section>
+      <section className="section section-light" id="ofertas"><div className="container"><h2>{c.offersSection.title}</h2><div className="offers offers-single">
+        <article className="offer-card featured">{c.offers.complete.badge && <span className="offer-badge">{c.offers.complete.badge}</span>}<h3>{c.offers.complete.title}</h3>{'subtitle' in c.offers.complete && c.offers.complete.subtitle && <p className="offer-subtitle">{c.offers.complete.subtitle}</p>}<FeatureList items={c.offers.complete.items} /><Price data={c.offers.complete} /><div className="offer-action"><Button onClick={() => trackCheckout(variant)} href={(isCopyPage() ? links.checkoutCopy || links.checkoutComplete : links.checkoutComplete) ? withAttributionParams(isCopyPage() ? links.checkoutCopy || links.checkoutComplete : links.checkoutComplete) : links.checkoutSimple ? withAttributionParams(links.checkoutSimple) : undefined}>{c.offers.complete.ctaLabel}</Button><img src={c.offersSection.paymentSecurityImage} alt={c.offersSection.paymentSecurityAlt} loading="lazy" /></div></article>
       </div></div></section>
-      <section className="section section-light"><div className="container guarantee"><img className="guarantee-seal" src={pageContent.guarantee.image} alt={pageContent.guarantee.imageAlt} loading="lazy" /><div><h2>{pageContent.guarantee.title}</h2><p>{pageContent.guarantee.body}</p></div></div></section>
-      <section className="section"><div className="container narrow"><h2>{pageContent.faqSection.title}</h2><div className="faq">{pageContent.faq.map((item, index) => { const expanded = faqOpen === index; return <div className="faq-item" key={item.question}><button onClick={() => setFaqOpen(expanded ? null : index)} aria-expanded={expanded} aria-controls={`faq-${index}`}><span>{item.question}</span>{expanded ? <Minus /> : <Plus />}</button><div id={`faq-${index}`} hidden={!expanded}><p>{item.answer}</p></div></div> })}</div></div></section>
+      <section className="section section-light"><div className="container guarantee"><img className="guarantee-seal" src={c.guarantee.image} alt={c.guarantee.imageAlt} loading="lazy" /><div><h2>{c.guarantee.title}</h2><p>{c.guarantee.body}</p></div></div></section>
+      <section className="section"><div className="container narrow"><h2>{c.faqSection.title}</h2><div className="faq">{c.faq.map((item, index) => { const expanded = faqOpen === index; return <div className="faq-item" key={item.question}><button onClick={() => setFaqOpen(expanded ? null : index)} aria-expanded={expanded} aria-controls={`faq-${index}`}><span>{item.question}</span>{expanded ? <Minus /> : <Plus />}</button><div id={`faq-${index}`} hidden={!expanded}><p>{item.answer}</p></div></div> })}</div></div></section>
     </main>
-    <footer><div className="container"><strong>{pageContent.footer.brand}</strong><p>{pageContent.footer.copyright}</p><nav aria-label="Links legais">{links.privacy && <a href={links.privacy}>Privacidade</a>}{links.terms && <a href={links.terms}>Termos</a>}{links.support && <a href={links.support}>Suporte</a>}</nav></div></footer>
+    <footer><div className="container"><strong>{c.footer.brand}</strong><p>{c.footer.copyright}</p><nav aria-label="Links legais">{links.privacy && <a href={links.privacy}>Privacidade</a>}{links.terms && <a href={links.terms}>Termos</a>}{links.support && <a href={links.support}>Suporte</a>}</nav></div></footer>
   </>
 }
 

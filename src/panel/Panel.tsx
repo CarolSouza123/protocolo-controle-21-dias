@@ -7,7 +7,7 @@ type Counters = {
   hours?: number[]; hours_bio?: number[]; hours_paid?: number[]; sales_hours?: number[]
 }
 type Day = { date: string } & Counters
-type Stats = { totals: Counters; days: Day[] }
+type Stats = { totals: Counters; days: Day[]; totalsB?: Counters; daysB?: Day[] }
 
 const KEY_STORE = 'p21_admin_key'
 const pct = (a: number, b: number) => (b > 0 ? `${((a / b) * 100).toFixed(1).replace('.', ',')}%` : '0%')
@@ -188,6 +188,7 @@ export default function Panel() {
   const [saved, setSaved] = useState('')
   const [range, setRange] = useState<RangeKey>('tudo')
   const [origin, setOrigin] = useState<OriginKey>('bio')
+  const [pageSel, setPageSel] = useState<'a' | 'b'>('a')
   const fileRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<ImportPreview | null>(null)
   const [importError, setImportError] = useState('')
@@ -275,15 +276,20 @@ export default function Panel() {
     if (range === '30d') return date >= shiftDay(today, -29) && date <= today
     return (!from || date >= from) && (!to || date <= to)
   }
-  const viewDays = stats.days.filter(d => inRange(d.date))
-  const t = range === 'tudo' ? stats.totals : sumDays(viewDays)
+  const baseTotals = pageSel === 'b' ? (stats.totalsB || zero) : stats.totals
+  const baseDays = pageSel === 'b' ? (stats.daysB || []) : stats.days
+  const viewDays = baseDays.filter(d => inRange(d.date))
+  const t = range === 'tudo' ? baseTotals : sumDays(viewDays)
+  const mainPeriod = range === 'tudo' ? stats.totals : sumDays(stats.days.filter(d => inRange(d.date)))
+  const salesQty = pageSel === 'b' ? mainPeriod.sales_qty : t.sales_qty
+  const salesRevenue = pageSel === 'b' ? mainPeriod.sales_revenue : t.sales_revenue
   const visitsOf = origin === 'bio' ? t.visits_bio : origin === 'paid' ? t.visits_paid : t.visits
   const clicksOf = origin === 'bio' ? t.checkout_bio : origin === 'paid' ? (t.checkout_paid || 0) : t.checkout_clicks
   const originName = origin === 'bio' ? 'pela bio' : origin === 'paid' ? 'de campanhas' : 'no total'
   const funnelSteps = [
-    { label: origin === 'bio' ? 'Entradas pela bio' : origin === 'paid' ? 'Entradas de campanhas' : 'Entradas na LP', value: visitsOf, color: '#22c55e', conv: '' },
-    { label: 'Cliques no checkout', value: clicksOf, color: '#16a34a', conv: `${pct(clicksOf, visitsOf)} de quem entrou` },
-    ...(origin === 'tudo' ? [{ label: 'Compras', value: t.sales_qty, color: '#15803d', conv: `${pct(t.sales_qty, t.checkout_clicks)} de quem clicou no checkout` }] : []),
+    { label: origin === 'bio' ? 'Entradas pela bio' : origin === 'paid' ? 'Entradas de campanhas' : 'Entradas na LP', value: visitsOf, color: '#22c55e', conv: '', nopct: false },
+    { label: 'Cliques no checkout', value: clicksOf, color: '#16a34a', conv: `${pct(clicksOf, visitsOf)} de quem entrou`, nopct: false },
+    ...(origin === 'tudo' ? [{ label: 'Compras', value: salesQty, color: '#15803d', conv: pageSel === 'b' ? 'Vendas gerais, sem separar por versão' : `${pct(t.sales_qty, t.checkout_clicks)} de quem clicou no checkout`, nopct: pageSel === 'b' }] : []),
   ]
   const hoursOf = (origin === 'bio' ? t.hours_bio : origin === 'paid' ? t.hours_paid : t.hours) || []
   const h24 = z24().map((_, i) => hoursOf[i] || 0)
@@ -318,13 +324,21 @@ export default function Panel() {
       </div>}
     </section>
     <section className="panel-card panel-filters-card">
+      <span className="panel-origin-title">Versão da página</span>
+      <div className="panel-filters">
+        <button type="button" className={`panel-chip${pageSel === 'a' ? ' active' : ''}`} onClick={() => setPageSel('a')}>Original</button>
+        <button type="button" className={`panel-chip${pageSel === 'b' ? ' active' : ''}`} onClick={() => setPageSel('b')}>Copy nova</button>
+      </div>
+      {pageSel === 'b' && <p className="panel-hint">Visitas e cliques da versão nova, contados separados da original. As vendas continuam gerais, porque o checkout é o mesmo.</p>}
+    </section>
+    <section className="panel-card panel-filters-card">
       <span className="panel-origin-title">Origem em destaque</span>
       <div className="panel-filters">
         {ORIGIN_LABELS.map(o => <button key={o.key} type="button" className={`panel-chip${origin === o.key ? ' active' : ''}`} onClick={() => setOrigin(o.key)}>{o.label}</button>)}
       </div>
     </section>
     <section className="panel-card">
-      <h2>Funil {origin === 'bio' ? 'da bio' : origin === 'paid' ? 'de campanhas' : 'do período (tudo)'}</h2>
+      <h2>{pageSel === 'b' ? 'Funil da versão nova' : 'Funil'} {origin === 'bio' ? '(bio)' : origin === 'paid' ? '(campanhas)' : '(tudo)'}</h2>
       {visitsOf === 0 ? <p className="panel-hint">Ainda sem entradas dessa origem no período selecionado.</p> : (
         <div>
           <div className="hfunnel">
@@ -334,7 +348,7 @@ export default function Panel() {
                 <div className="hfunnel-col" key={step.label}>
                   <div className="hfunnel-label">{step.label}</div>
                   <div className="hfunnel-stage">
-                    <div className="hfunnel-fill" style={{ height: `${Math.max(p, step.value > 0 ? 14 : 4)}%`, background: step.color }}>{p >= 12 ? pct(step.value, visitsOf) : ''}</div>
+                    <div className="hfunnel-fill" style={{ height: `${Math.min(100, Math.max(p, step.value > 0 ? 14 : 4))}%`, background: step.color }}>{p >= 12 && !step.nopct ? pct(step.value, visitsOf) : ''}</div>
                   </div>
                   <div className="hfunnel-value">{step.value}</div>
                   <div className="hfunnel-sub">{i === 0 ? '100% das entradas' : `${pct(step.value, visitsOf)} das entradas`}</div>
@@ -343,9 +357,11 @@ export default function Panel() {
               )
             })}
           </div>
-          {origin === 'tudo'
-            ? <p className="funnel-total">Conversão completa do período: {pct(t.sales_qty, t.visits)} das entradas viraram compra.</p>
-            : <p className="funnel-total">Conversão {originName}: {pct(clicksOf, visitsOf)} das entradas clicaram no checkout. Compras do período (geral): {t.sales_qty}.</p>}
+          {pageSel === 'b'
+            ? <p className="funnel-total">Conversão da versão nova: {pct(clicksOf, visitsOf)} das entradas clicaram no checkout. Compras no período (geral, sem separar por versão): {salesQty}.</p>
+            : origin === 'tudo'
+              ? <p className="funnel-total">Conversão completa do período: {pct(t.sales_qty, t.visits)} das entradas viraram compra.</p>
+              : <p className="funnel-total">Conversão {originName}: {pct(clicksOf, visitsOf)} das entradas clicaram no checkout. Compras do período (geral): {t.sales_qty}.</p>}
           {origin === 'paid' && <p className="panel-hint">Os cliques no checkout de campanhas passaram a ser contados separados agora. Antes eles entravam só no total.</p>}
         </div>
       )}
@@ -353,8 +369,8 @@ export default function Panel() {
     <section className="panel-grid">
       <div className="panel-card panel-featured"><span>{origin === 'bio' ? 'Visitas pela bio' : origin === 'paid' ? 'Visitas de campanhas' : 'Entradas na LP (total)'}</span><strong>{visitsOf}</strong><small>{origin === 'tudo' ? `Da bio: ${t.visits_bio} • Campanhas: ${t.visits_paid} • Outras: ${t.visits_other}` : `${pct(visitsOf, t.visits)} de todas as entradas • Total na página: ${t.visits}`}</small></div>
       <div className="panel-card"><span>Cliques no checkout</span><strong>{clicksOf}</strong><small>{pct(clicksOf, visitsOf)} das visitas {originName}</small></div>
-      <div className="panel-card"><span>Compras lançadas</span><strong>{t.sales_qty}</strong><small>{origin === 'tudo' ? `${pct(t.sales_qty, t.checkout_clicks)} dos cliques no checkout` : 'Lançadas no geral, sem separar a origem'}</small></div>
-      <div className="panel-card"><span>Receita lançada</span><strong>{brl(t.sales_revenue)}</strong><small>Ticket médio: {t.sales_qty ? brl(t.sales_revenue / t.sales_qty) : brl(0)}</small></div>
+      <div className="panel-card"><span>Compras lançadas</span><strong>{salesQty}</strong><small>{pageSel === 'b' ? 'Vendas gerais, sem separar por versão' : origin === 'tudo' ? `${pct(t.sales_qty, t.checkout_clicks)} dos cliques no checkout` : 'Lançadas no geral, sem separar a origem'}</small></div>
+      <div className="panel-card"><span>Receita lançada</span><strong>{brl(salesRevenue)}</strong><small>Ticket médio: {salesQty ? brl(salesRevenue / salesQty) : brl(0)}</small></div>
     </section>
     <section className="panel-card">
       <h2>Horários e dias da semana</h2>

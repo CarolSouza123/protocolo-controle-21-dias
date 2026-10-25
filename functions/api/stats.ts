@@ -6,13 +6,17 @@ export const onRequestGet = async ({ request, env }: PagesCtx): Promise<Response
   if (denied) return denied
   const totals = await loadCounters(env.TRACK_KV, 'total')
   const days: Array<{ date: string } & Counters> = []
+  const totalsB = await loadCounters(env.TRACK_KV, 'total:b')
+  const daysB: Array<{ date: string } & Counters> = []
   for (let i = 0; i < 30; i++) {
     const d = new Date(Date.now() - i * 86400000)
     const key = dayKey(d)
     const c = await loadCounters(env.TRACK_KV, `d:${key}`)
-    if (Object.values(c).some(v => v > 0)) days.push({ date: key, ...c })
+    if (Object.values(c).some(v => typeof v === 'number' && v > 0)) days.push({ date: key, ...c })
+    const cb = await loadCounters(env.TRACK_KV, `d:${key}:b`)
+    if (Object.values(cb).some(v => typeof v === 'number' && v > 0)) daysB.push({ date: key, ...cb })
   }
-  return json({ totals, days })
+  return json({ totals, days, totalsB, daysB })
 }
 
 export const onRequestPost = async ({ request, env }: PagesCtx): Promise<Response> => {

@@ -1,9 +1,19 @@
 const VISIT_KEY = 'p21_visit_tracked'
 
 export type Origin = 'bio' | 'paid' | 'other'
+export type Variant = 'a' | 'b'
+
+export function currentVariant(): Variant {
+  try {
+    return window.location.pathname.replace(/\/$/, '').startsWith('/copy') ? 'b' : 'a'
+  } catch {
+    return 'a'
+  }
+}
 
 export function classifyOrigin(): Origin {
   try {
+    if (window.location.pathname.replace(/\/$/, '') === '/copy/bio') return 'bio'
     const current = new URLSearchParams(window.location.search)
     const stored = JSON.parse(window.localStorage.getItem('lowticket_attribution') || '{}') as Record<string, string>
     const get = (k: string) => current.get(k) || stored[k] || ''
@@ -17,9 +27,9 @@ export function classifyOrigin(): Origin {
   }
 }
 
-function send(event: 'visit' | 'checkout') {
+function send(event: 'visit' | 'checkout', variant: Variant) {
   try {
-    const payload = JSON.stringify({ event, origin: classifyOrigin() })
+    const payload = JSON.stringify({ event, origin: classifyOrigin(), variant })
     if (navigator.sendBeacon) {
       navigator.sendBeacon('/api/track', new Blob([payload], { type: 'application/json' }))
     } else {
@@ -30,14 +40,15 @@ function send(event: 'visit' | 'checkout') {
   }
 }
 
-export function trackVisitOnce() {
+export function trackVisitOnce(variant: Variant = currentVariant()) {
   try {
-    if (window.sessionStorage.getItem(VISIT_KEY)) return
-    window.sessionStorage.setItem(VISIT_KEY, '1')
+    const key = `${VISIT_KEY}_${variant}`
+    if (window.sessionStorage.getItem(key)) return
+    window.sessionStorage.setItem(key, '1')
   } catch { /* segue e conta */ }
-  send('visit')
+  send('visit', variant)
 }
 
-export function trackCheckout() {
-  send('checkout')
+export function trackCheckout(variant: Variant = currentVariant()) {
+  send('checkout', variant)
 }
