@@ -74,6 +74,10 @@ body footer { background:#090d16; border-top-color:#263241 }
 /* Versao B: bonus empilhados, um embaixo do outro (depois das regras count, para prevalecer) */
 .card-grid.stacked { grid-template-columns:1fr; max-width:640px; margin-inline:auto }
 
+/* Versao B: menos espaco vazio entre a oferta e a garantia */
+.section.offer-tight { padding-bottom:32px }
+.section.guarantee-tight { padding-top:32px }
+
 /* Painel: filtro por data e funil horizontal */
 .panel-filters-card { padding:16px 24px }
 .panel-filters { display:flex; gap:8px; flex-wrap:wrap }
