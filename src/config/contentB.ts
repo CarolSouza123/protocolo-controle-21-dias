@@ -3,6 +3,8 @@
 // No lugar da prova social, por enquanto, vai o bloco de situações da original;
 // o carrossel de depoimentos (src/components/TestimonialsCarousel.tsx) fica guardado
 // para quando os depoimentos reais chegarem.
+// Estrutura própria da versão B: sem seção de materiais, tudo vira bônus
+// (4 bônus empilhados, um embaixo do outro) e a oferta lista todos os nomes.
 
 export const pageContentB = {
   urgencyBar: {
@@ -50,10 +52,12 @@ export const pageContentB = {
     subtitle: 'Veja relatos autênticos de usuários sobre sua experiência com os materiais e a rotina de exercícios.',
     items: [] as string[],
   },
-  bonusesSection: { title: 'Você também recebe 2 bônus' },
+  bonusesSection: { title: 'Você também recebe 4 bônus' },
   bonuses: [
-    { src: '/images/bonus01.webp', alt: 'Imagem do bônus 01', label: 'Imagem do bônus 01', ratio: '1:1' as const, eyebrow: 'Bônus 01', title: 'Reset da Respiração na Hora H', description: 'Um exercício guiado de respiração para ajudar você a praticar o controle da tensão e do nervosismo.', value: '' },
-    { src: '/images/bonus02.webp', alt: 'Imagem do bônus 02', label: 'Imagem do bônus 02', ratio: '1:1' as const, eyebrow: 'Bônus 02', title: 'Áudio Guiado SOS Pré-Hora H', description: 'Uma faixa de aproximadamente 2 minutos para acompanhar sua preparação antes de um encontro íntimo.', value: '' },
+    { src: '/images/material01.webp', alt: 'Imagem do bônus 01', label: 'Imagem do bônus 01', ratio: '1:1' as const, eyebrow: 'Bônus 01', title: 'Guia de Localização do Músculo Certo', description: 'Uma referência para entender qual músculo está sendo trabalhado e acompanhar os exercícios propostos.', value: '' },
+    { src: '/images/material02.webp', alt: 'Imagem do bônus 02', label: 'Imagem do bônus 02', ratio: '1:1' as const, eyebrow: 'Bônus 02', title: 'Cronômetro Guiado de 5 Minutos', description: 'Uma ferramenta para acompanhar as sessões sem precisar improvisar a duração de cada treino.', value: '' },
+    { src: '/images/bonus01.webp', alt: 'Imagem do bônus 03', label: 'Imagem do bônus 03', ratio: '1:1' as const, eyebrow: 'Bônus 03', title: 'Reset da Respiração na Hora H', description: 'Um exercício guiado de respiração para ajudar você a praticar o controle da tensão e do nervosismo.', value: '' },
+    { src: '/images/bonus02.webp', alt: 'Imagem do bônus 04', label: 'Imagem do bônus 04', ratio: '1:1' as const, eyebrow: 'Bônus 04', title: 'Áudio Guiado SOS Pré-Hora H', description: 'Uma faixa de aproximadamente 2 minutos para acompanhar sua preparação antes de um encontro íntimo.', value: '' },
   ],
   offersSection: {
     title: 'Comece seu treino hoje',
@@ -63,17 +67,17 @@ export const pageContentB = {
   offers: {
     simple: {
       title: 'Protocolo 21 Dias + Bônus Inclusos',
-      items: ['Guia de Localização do Músculo Certo', 'Web App com Cronômetro dos 21 Dias', 'Bônus 01: Reset da Respiração na Hora H', 'Bônus 02: Áudio Guiado SOS Pré-Hora H', 'Acesso digital pelo celular'],
+      items: ['Bônus 01: Guia de Localização do Músculo Certo', 'Bônus 02: Cronômetro Guiado de 5 Minutos', 'Bônus 03: Reset da Respiração na Hora H', 'Bônus 04: Áudio Guiado SOS Pré-Hora H', 'Acesso digital pelo celular'],
       previousPrice: 'R$ 67,00', installmentCount: 0, installmentValue: '', cashValue: 'R$ 27,00', ctaLabel: 'QUERO ACESSAR O PROTOCOLO',
     },
     complete: {
       badge: '', title: 'Protocolo 21 Dias + Bônus Inclusos',
       subtitle: 'Tenha acesso ao Protocolo 21 Dias e aos dois bônus complementares.',
       items: [
-        { label: 'Guia de Localização do Músculo Certo' },
-        { label: 'Web App com Cronômetro dos 21 Dias' },
-        { label: 'Bônus 01: Reset da Respiração na Hora H' },
-        { label: 'Bônus 02: Áudio Guiado SOS Pré-Hora H' },
+        { label: 'Bônus 01: Guia de Localização do Músculo Certo' },
+        { label: 'Bônus 02: Cronômetro Guiado de 5 Minutos' },
+        { label: 'Bônus 03: Reset da Respiração na Hora H' },
+        { label: 'Bônus 04: Áudio Guiado SOS Pré-Hora H' },
         { label: 'Acesso digital pelo celular' },
       ],
       previousPrice: 'R$ 67,00', installmentCount: 0, installmentValue: '', cashValue: 'R$ 27,00', ctaLabel: 'QUERO ACESSAR O PROTOCOLO',

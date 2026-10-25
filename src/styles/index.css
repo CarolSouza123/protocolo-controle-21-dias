@@ -71,6 +71,9 @@ body footer { background:#090d16; border-top-color:#263241 }
 .situation-help strong { color:var(--brand-primary) }
 @media (max-width:767px) { .card-grid.count-4 { grid-template-columns:1fr } }
 
+/* Versao B: bonus empilhados, um embaixo do outro (depois das regras count, para prevalecer) */
+.card-grid.stacked { grid-template-columns:1fr; max-width:640px; margin-inline:auto }
+
 /* Painel: filtro por data e funil horizontal */
 .panel-filters-card { padding:16px 24px }
 .panel-filters { display:flex; gap:8px; flex-wrap:wrap }
